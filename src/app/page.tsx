@@ -1,5 +1,5 @@
 import { LiveBoard } from '@/components/LiveBoard'
 
-export default function Pulse() {
+export default function Home() {
   return <LiveBoard />
 }

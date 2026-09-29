@@ -66,8 +66,10 @@ export function LiveBoard() {
         setErrors((e) => ({ ...e, [key]: message }))
         if (!message) setUpdatedAt(Date.now())
       }
-      const fail = (key: 'launches' | 'trades' | 'board') => (e: unknown) =>
-        settle(key, String((e as Error)?.message ?? e).slice(0, 420))
+      const fail = (key: 'launches' | 'trades' | 'board') => (e: unknown) => {
+        const err = e as { shortMessage?: string; message?: string }
+        settle(key, String(err?.shortMessage || err?.message || e).slice(0, 420))
+      }
 
       // Each panel paints the moment its own read lands.
       void fetchLaunches().then((v) => {
@@ -221,11 +223,11 @@ export function LiveBoard() {
               </Link>
             </div>
           ) : (
-            <ul className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
               {shownTokens.map((t) => {
                 const p = pct(t.raised, t.threshold)
                 return (
-                  <li key={t.address}>
+                  <li key={t.address} className="min-w-0">
                     <Link href={`/token?address=${t.address}`} className="tile block p-4">
                       <div className="flex items-start gap-3">
                         <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-white/10">

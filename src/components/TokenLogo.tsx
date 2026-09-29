@@ -31,7 +31,7 @@ export function TokenLogo({
     return (
       <div
         className={`flex items-center justify-center bg-white/5 font-semibold text-[var(--color-muted)] ${
-          fill ? 'absolute inset-0 text-2xl' : 'shrink-0 rounded-xl text-[10px]'
+          fill ? 'absolute inset-0 text-base tracking-tight' : 'shrink-0 rounded-xl text-[10px]'
         }`}
         style={fill ? undefined : { width: size, height: size }}
       >

@@ -47,7 +47,11 @@ export function TokenView() {
         const quote = await quoteAsset(record.pairToken)
         if (alive) setData({ record, meta, curve, quote })
       } catch (e) {
-        if (alive) setError((e as Error).message.slice(0, 420))
+        if (alive) {
+          // viem errors carry the full request body; the short message is the useful part.
+          const err = e as { shortMessage?: string; message?: string }
+          setError(String(err.shortMessage || err.message || e).split('\n')[0]!.slice(0, 240))
+        }
       }
     })()
     return () => {
@@ -60,7 +64,7 @@ export function TokenView() {
       <div className="card p-8">
         <h1 className="text-lg font-semibold">Cannot show this token</h1>
         <p className="mt-1 text-sm text-[var(--color-muted)]">{error}</p>
-        <Link href="/" className="btn-soft mt-4 inline-block px-4 py-2 text-sm">Back to Pulse</Link>
+        <Link href="/" className="btn-soft mt-4 inline-block px-4 py-2 text-sm">Back to the launchpad</Link>
       </div>
     )
   }

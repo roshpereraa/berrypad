@@ -1,6 +1,6 @@
 'use client'
 
-import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit'
+import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
 import { WagmiProvider } from 'wagmi'
@@ -26,7 +26,13 @@ export function Providers({ children }: { children: ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
-          theme={{ lightMode: lightTheme(), darkMode: darkTheme() }}
+          // The site is dark in every OS theme, so the wallet modal is too.
+          theme={darkTheme({
+            accentColor: '#19d98f',
+            accentColorForeground: '#00150c',
+            borderRadius: 'large',
+            overlayBlur: 'small',
+          })}
           appInfo={{ appName: 'Berrypad' }}
         >
           {children}

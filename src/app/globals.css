@@ -290,6 +290,12 @@ select:focus {
   .dot-live, .shimmer, .rail-track { animation: none; }
 }
 
+/* Long hashes and RPC errors are single unbroken words; let them wrap
+   rather than widen the page. */
+main {
+  overflow-wrap: break-word;
+}
+
 /* ------------------------------------------------------------------ */
 /* Brand                                                               */
 /* ------------------------------------------------------------------ */
