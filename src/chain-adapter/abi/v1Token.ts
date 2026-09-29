@@ -1,0 +1,72 @@
+/** LaunchpadLauncherToken (V1) - ERC-20 plus on-chain metadata and its canonical pool. */
+export const v1TokenAbi = [
+  {
+    type: 'function',
+    name: 'name',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'string' }],
+  },
+  {
+    type: 'function',
+    name: 'symbol',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'string' }],
+  },
+  {
+    type: 'function',
+    name: 'decimals',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'uint8' }],
+  },
+  {
+    type: 'function',
+    name: 'totalSupply',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+  },
+  {
+    type: 'function',
+    name: 'logo',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'string' }],
+  },
+  {
+    type: 'function',
+    name: 'description',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'string' }],
+  },
+  {
+    type: 'function',
+    name: 'socials',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [
+      { name: 'twitter', type: 'string' },
+      { name: 'telegram', type: 'string' },
+      { name: 'discord', type: 'string' },
+      { name: 'website', type: 'string' },
+      { name: 'farcaster', type: 'string' },
+    ],
+  },
+  {
+    type: 'function',
+    name: 'liquidityPool',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'address' }],
+  },
+  {
+    type: 'function',
+    name: 'restrictionEndBlock',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+  },
+] as const
