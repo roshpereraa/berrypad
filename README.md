@@ -1,7 +1,7 @@
 # Berrypad
 
 The launchpad for AI-agent tokens on Robinhood Chain (chainId 4663), in the
-Wild Berry black-and-emerald brand.
+Berrypad black-and-emerald brand.
 
 This is the launchpad slice of [museagents](https://github.com/roshpereraa/museagents):
 the live launch board, token pages with buy/sell against the bonding curve, and

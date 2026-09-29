@@ -37,7 +37,7 @@
         display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
       #b-tile-fill { position: absolute; inset: 0; background: radial-gradient(circle at 35% 30%, #1fe39a, #04492d);
         display: flex; align-items: center; justify-content: center; }
-      #b-tile-fill img { width: 96px; height: 96px; }
+      #b-tile-fill .coin-mark { font-size: 54px; font-weight: 800; color: rgba(255,255,255,0.92); }
       #b-btn { height: 104px; font-size: 38px; margin-top: 12px; position: relative; overflow: hidden; }
       #b-btn span { position: absolute; }
       #b-cursor { position: absolute; left: 0; top: 0; width: 64px; height: 64px; }
@@ -50,7 +50,7 @@
       #c-token { display: flex; align-items: center; gap: 24px; margin-bottom: 26px; }
       #c-token .t-logo { width: 88px; height: 88px; border-radius: 22px; background: radial-gradient(circle at 35% 30%, #1fe39a, #04492d);
         display: flex; align-items: center; justify-content: center; }
-      #c-token .t-logo img { width: 58px; }
+      #c-token .t-logo .coin-mark { font-size: 34px; font-weight: 800; color: rgba(255,255,255,0.92); }
       #c-token b { display: block; font-size: 44px; }
       #c-stats { margin-left: auto; text-align: right; }
       #c-raised { font-size: 64px; font-weight: 700; }
@@ -114,7 +114,7 @@
                   <span class="label">Name</span>
                   <div id="b-name" class="input"><span id="b-name-t"></span><i id="b-caret1" class="caret"></i></div>
                 </div>
-                <div id="b-tile"><div id="b-tile-fill"><img src="assets/logo.svg" alt="" /></div></div>
+                <div id="b-tile"><div id="b-tile-fill"><span class="coin-mark">MO</span></div></div>
               </div>
               <div class="field">
                 <span class="label">Ticker</span>
@@ -143,8 +143,8 @@
             <div id="c-panel" class="panel">
               <div>
                 <div id="c-token">
-                  <div class="t-logo"><img src="assets/logo.svg" alt="" /></div>
-                  <div><b>Wild Berry</b><span class="label">$BERRY</span></div>
+                  <div class="t-logo"><span class="coin-mark">MO</span></div>
+                  <div><b>Moss Agent</b><span class="label">$MOSS</span></div>
                   <div id="c-stats">
                     <div id="c-raised" class="mono">0.00 ETH</div>
                     <div id="c-pct" class="mono chip-up">0.0% to graduation</div>
@@ -248,13 +248,13 @@
         tl.to(p, { n: text.length, duration: dur, ease: 'none', onUpdate: () => { el.textContent = text.slice(0, Math.round(p.n)); } }, at);
       };
       tl.set('#b-name', { className: 'input on' }, 3.3);
-      typeInto('#b-name-t', 'Wild Berry', 3.35, 0.75);
+      typeInto('#b-name-t', 'Moss Agent', 3.35, 0.75);
       tl.set('#b-name', { className: 'input' }, 4.15);
       tl.set('#b-caret1', { opacity: 0 }, 4.15);
       tl.set('#b-caret2', { opacity: 0 }, 0);
       tl.set('#b-caret2', { opacity: 1 }, 4.15);
       tl.set('#b-tick', { className: 'input on' }, 4.15);
-      typeInto('#b-tick-t', '$BERRY', 4.2, 0.45);
+      typeInto('#b-tick-t', '$MOSS', 4.2, 0.45);
       tl.set('#b-tick', { className: 'input' }, 4.75);
       tl.set('#b-caret2', { opacity: 0 }, 4.75);
       tl.fromTo('#b-tile-fill', { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.5, ease: 'back.out(2)' }, 4.7);

@@ -1,5 +1,5 @@
 /**
- * Berrypad mark — the Wild Berry leaf-berry.
+ * Berrypad mark — the leaf-berry.
  *
  * A heart-shaped berry with two leaves at the crown, cut by one diagonal
  * stroke. The cut is a mask rather than a painted line, so the mark reads the

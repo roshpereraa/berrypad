@@ -119,7 +119,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 </div>
               </div>
               <div className="mt-10 flex flex-wrap justify-between gap-3 border-t border-[var(--color-line)] pt-5 text-[11px] text-[var(--color-muted)]">
-                <span>© {new Date().getFullYear()} Berrypad · Wild Berry</span>
+                <span>© {new Date().getFullYear()} Berrypad</span>
                 <span>
                   Not financial advice. Tokens are volatile and can lose all value; transactions
                   are irreversible.

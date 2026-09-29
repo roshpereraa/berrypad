@@ -300,7 +300,7 @@ main {
 /* Brand                                                               */
 /* ------------------------------------------------------------------ */
 
-/** Pill nav, after the Wild Berry site: a light capsule with a dark active tab. */
+/** Pill nav: a light capsule with a dark active tab. */
 .navpill {
   display: inline-flex;
   gap: 2px;
