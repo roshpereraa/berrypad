@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Berrypad — Hype</title>
+    <link rel="stylesheet" href="assets/brand.css" />
+    <script src="assets/gsap.min.js"></script>
+    <script src="assets/swirl.js"></script>
+    <style>
+      #stage { position: absolute; inset: 0; }
+      .full { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+      .hide { opacity: 0; }
+
+      /* intro */
+      #i-ready { font-family: 'JetBrains Mono', monospace; font-size: 40px; letter-spacing: 0.5em; color: var(--accent-hi); }
+      .count { font-size: 620px; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+      #i-logo { width: 380px; height: 380px; filter: drop-shadow(0 0 90px rgba(25,217,143,0.9)); }
+      .ring { position: absolute; width: 400px; height: 400px; border-radius: 50%; border: 6px solid var(--accent-hi); }
+
+      /* word barrage */
+      #w-bg { position: absolute; inset: 0; background: #000; }
+      .word { font-size: 300px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; white-space: nowrap; }
+
+      /* breakdown */
+      #k-box { width: 1200px; }
+      #k-label { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 30px; letter-spacing: 0.2em; color: var(--muted); }
+      #k-pct { color: var(--accent-hi); }
+      #k-bar { margin-top: 26px; height: 34px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; }
+      #k-fill { width: 100%; height: 100%; transform-origin: left center; background: linear-gradient(90deg, var(--accent-lo), var(--accent-hi));
+        box-shadow: 0 0 40px rgba(25,217,143,0.8); }
+
+      /* tunnel */
+      .fly { position: absolute; left: 50%; top: 50%; width: 520px; margin-left: -260px; margin-top: -150px; padding: 30px;
+        border-radius: 30px; background: rgba(6,16,11,0.92); border: 2px solid rgba(25,217,143,0.5);
+        box-shadow: 0 0 80px -10px rgba(25,217,143,0.6); }
+      .fly .top { display: flex; align-items: center; gap: 22px; }
+      .fly .tl { width: 96px; height: 96px; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 800; }
+      .fly b { display: block; font-size: 42px; }
+      .fly .meter { margin-top: 26px; height: 16px; }
+      .fly .row { display: flex; justify-content: space-between; margin-top: 20px; font-size: 30px; }
+      #t-title { position: absolute; z-index: 2; left: 0; right: 0; bottom: 90px; text-align: center; font-size: 110px; font-weight: 800; letter-spacing: -0.03em;
+        text-shadow: 0 0 40px #000, 0 0 80px #000; }
+
+      /* rocket */
+      #r-chart { position: absolute; left: 160px; right: 160px; top: 170px; height: 760px; }
+      #r-num { position: absolute; left: 190px; top: 150px; font-family: 'JetBrains Mono', monospace; font-size: 170px; font-weight: 600; color: var(--accent-hi);
+        text-shadow: 0 0 60px rgba(25,217,143,0.7); }
+      #r-sub { position: absolute; left: 200px; top: 350px; }
+      .stamp { position: absolute; font-size: 170px; font-weight: 800; color: var(--accent); border: 10px solid var(--accent); border-radius: 30px;
+        padding: 0 44px; text-shadow: 0 0 60px rgba(25,217,143,0.8); background: rgba(0,0,0,0.55); }
+
+      /* ticker walls */
+      #m-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+      .mrow { white-space: nowrap; font-size: 200px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.02; }
+      .mrow.o { color: transparent; -webkit-text-stroke: 3px var(--accent); }
+      .mrow.g { color: var(--accent); }
+      #m-inv { position: absolute; inset: 0; background: var(--accent); mix-blend-mode: difference; }
+
+      /* grid */
+      #g-grid { position: absolute; inset: 60px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 18px; }
+      .gt { border-radius: 26px; background: rgba(6,16,11,0.9); border: 2px solid var(--line); display: flex; align-items: center; justify-content: center;
+        font-size: 72px; font-weight: 800; letter-spacing: -0.02em; }
+
+      /* end */
+      #e-logo { width: 300px; height: 300px; filter: drop-shadow(0 0 80px rgba(25,217,143,0.9)); }
+      #e-col { display: flex; flex-direction: column; align-items: center; }
+      #e-word { margin-top: 30px; font-size: 150px; font-weight: 800; letter-spacing: 0.06em; line-height: 1; }
+      #e-word .pad { color: var(--accent); }
+      #e-row { margin-top: 36px; display: flex; gap: 30px; align-items: center; font-size: 48px; font-weight: 700; }
+      #e-row .btn { height: 96px; padding: 0 54px; font-size: 40px; }
+
+      #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+      #gflash { position: absolute; inset: 0; background: var(--accent); opacity: 0; pointer-events: none; }
+      #scan { position: absolute; inset: 0; pointer-events: none; opacity: 0.18;
+        background: repeating-linear-gradient(0deg, rgba(0,0,0,0.6) 0 2px, transparent 2px 4px); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="25" data-width="1920" data-height="1080">
+      <audio id="bgm" src="music.m4a" data-start="0" data-duration="25" data-volume="1"></audio>
+
+      <div id="bg" class="clip" data-start="0" data-duration="25">
+        <canvas id="swirl"></canvas>
+        <div class="vignette"></div>
+      </div>
+
+      <div id="stage" class="clip" data-start="0" data-duration="25">
+        <!-- intro -->
+        <div id="s-intro" class="full">
+          <div id="i-ready" class="full hide">READY?</div>
+          <div id="i-3" class="full hide"><span class="count">3</span></div>
+          <div id="i-2" class="full hide"><span class="count">2</span></div>
+          <div id="i-1" class="full hide"><span class="count glow">1</span></div>
+          <div id="i-ring1" class="full hide"><div class="ring"></div></div>
+          <div id="i-ring2" class="full hide"><div class="ring"></div></div>
+          <div id="i-logoW" class="full hide"><img id="i-logo" src="assets/logo.svg" alt="" /></div>
+        </div>
+
+        <!-- word barrage -->
+        <div id="s-words" class="full hide"><div id="w-bg"></div></div>
+
+        <!-- breakdown -->
+        <div id="s-break" class="full hide">
+          <div id="k-box">
+            <div id="k-label"><span>LOADING THE CURVE</span><span id="k-pct">00%</span></div>
+            <div id="k-bar"><div id="k-fill"></div></div>
+          </div>
+        </div>
+
+        <!-- tunnel -->
+        <div id="s-tunnel" class="full hide">
+          <div id="t-cards" class="full"></div>
+          <div id="t-title">EVERY LAUNCH. <span class="glow">LIVE.</span></div>
+        </div>
+
+        <!-- rocket -->
+        <div id="s-rocket" class="full hide">
+          <svg id="r-chart" viewBox="0 0 1600 760" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="r-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#19d98f" stop-opacity="0.55" />
+                <stop offset="1" stop-color="#19d98f" stop-opacity="0" />
+              </linearGradient>
+              <clipPath id="r-clip"><rect id="r-clip-r" x="0" y="0" width="0" height="760" /></clipPath>
+            </defs>
+            <g clip-path="url(#r-clip)">
+              <path id="r-area" fill="url(#r-grad)" />
+              <path id="r-line" fill="none" stroke="#6ff5c0" stroke-width="8" stroke-linecap="round" />
+            </g>
+            <circle id="r-dot" r="18" fill="#fff" />
+          </svg>
+          <div id="r-num">0%</div>
+          <div id="r-sub" class="label">TO GRADUATION</div>
+          <div id="st1" class="full hide"><div class="stamp" style="transform: rotate(-8deg)">GRADUATED</div></div>
+          <div id="st2" class="full hide"><div class="stamp" style="transform: translate(-260px, -220px) rotate(6deg)">GRADUATED</div></div>
+          <div id="st3" class="full hide"><div class="stamp" style="transform: translate(280px, 230px) rotate(-3deg)">GRADUATED</div></div>
+        </div>
+
+        <!-- ticker walls -->
+        <div id="s-walls" class="full hide">
+          <div id="m-wrap"></div>
+          <div id="m-inv" class="hide"></div>
+        </div>
+
+        <!-- grid -->
+        <div id="s-grid" class="full hide"><div id="g-grid"></div></div>
+
+        <!-- end -->
+        <div id="s-end" class="full hide">
+          <div id="e-col">
+            <img id="e-logo" src="assets/logo.svg" alt="" />
+            <div id="e-word">BERRY<span class="pad">PAD</span></div>
+            <div id="e-row"><div class="btn">Launch yours</div><span>berrypad.tech</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="fx" class="clip" data-start="0" data-duration="25">
+        <div id="gflash"></div>
+        <div id="flash"></div>
+        <div id="scan"></div>
+      </div>
+    </div>
+
+    <script>
+      const DUR = 25;
+      const BPM = 128, SPB = 60 / BPM, B0 = 0.279;
+      const B = (i) => B0 + i * SPB;      // beat grid from `hyperframes beats`
+      const DROP = B(21);                  // 10.12 — the drop
+      const FINAL = 23.6;                  // last hit, measured from the track
+      const tl = gsap.timeline({ paused: true });
+
+      /* ---------------- background ---------------- */
+      const swirl = BerrySwirl.mount(document.getElementById('swirl'), { cell: 4, seed: 41, quietR: 0.3 });
+      const gainKeys = [[0, 0.15], [B(8) - 0.01, 0.4], [B(8), 2.4], [B(9), 1.0], [8.2, 0.9], [9.9, 0.15], [DROP - 0.01, 0.1], [DROP, 2.6],
+        [DROP + 0.8, 1.5], [21.3, 1.4], [23.5, 0.6], [FINAL, 2.6], [24.3, 1.1], [25, 0.9]];
+      const lerpKeys = (keys, t) => {
+        for (let i = 1; i < keys.length; i++) if (t <= keys[i][0]) {
+          const [t0, v0] = keys[i - 1], [t1, v1] = keys[i];
+          return v0 + (v1 - v0) * ((t - t0) / Math.max(1e-6, t1 - t0));
+        }
+        return keys[keys.length - 1][1];
+      };
+      const clock = { t: 0 };
+      tl.to(clock, { t: DUR, duration: DUR, ease: 'none', onUpdate: () => {
+        const t = clock.t;
+        swirl.state.gain = lerpKeys(gainKeys, t);
+        swirl.state.quiet = t < DROP ? 0.5 : 0.15;
+        // The field runs faster after the drop.
+        swirl.draw(t * 0.9 + Math.max(0, t - DROP) * 1.6);
+      } }, 0);
+
+      /* ---------------- helpers ---------------- */
+      // Many flashes share one overlay, so none may render its start state early.
+      const flash = (t, peak = 0.9, dur = 0.35, el = '#flash') =>
+        tl.fromTo(el, { opacity: peak }, { opacity: 0, duration: dur, ease: 'power2.out', immediateRender: false }, t);
+      tl.set(['#flash', '#gflash'], { opacity: 0 }, 0);
+      const shake = (t, amp = 22, n = 4) => {
+        for (let k = 0; k < n; k++) {
+          const s = k % 2 ? -1 : 1, a = amp * (1 - k / n);
+          tl.to('#stage', { x: s * a, y: -s * a * 0.6, duration: 0.03, ease: 'none' }, t + k * 0.03);
+        }
+        tl.to('#stage', { x: 0, y: 0, duration: 0.03, ease: 'none' }, t + n * 0.03);
+      };
+      const show = (sel, a, b) => { tl.set(sel, { opacity: 1 }, a); if (b !== undefined) tl.set(sel, { opacity: 0 }, b); };
+
+      /* ---------------- 1. intro countdown ---------------- */
+      show('#i-ready', B(0), B(2));
+      tl.fromTo('#i-ready', { scale: 0.9 }, { scale: 1.05, duration: 0.9, ease: 'none' }, B(0));
+      [['#i-3', 2], ['#i-2', 4], ['#i-1', 6]].forEach(([sel, b]) => {
+        show(sel, B(b), B(b + 2));
+        tl.fromTo(sel, { scale: 2.2, rotation: b === 4 ? 6 : -6 }, { scale: 1, rotation: 0, duration: 0.18, ease: 'power4.out' }, B(b));
+        tl.to(sel, { scale: 0.85, duration: 0.7, ease: 'none' }, B(b) + 0.2);
+        flash(B(b), 0.35, 0.25, '#gflash');
+        shake(B(b), 16, 3);
+      });
+      show('#i-logoW', B(8), B(9) + 0.25);
+      tl.fromTo('#i-logo', { scale: 3, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.22, ease: 'power4.out' }, B(8));
+      tl.to('#i-logoW', { scale: 0.2, opacity: 0, duration: 0.2, ease: 'power3.in' }, B(9) + 0.05);
+      show('#i-ring1', B(8)); show('#i-ring2', B(8) + 0.12);
+      tl.fromTo('#i-ring1 .ring', { scale: 0.5, opacity: 1 }, { scale: 5, opacity: 0, duration: 0.8, ease: 'power2.out' }, B(8));
+      tl.fromTo('#i-ring2 .ring', { scale: 0.5, opacity: 1 }, { scale: 4, opacity: 0, duration: 0.8, ease: 'power2.out' }, B(8) + 0.12);
+      flash(B(8), 1, 0.5);
+      shake(B(8), 34, 6);
+
+      /* ---------------- 2. word barrage, one per beat ---------------- */
+      const words = [
+        ['NAME IT.', '#000', '#fff'], ['TICK IT.', '#19d98f', '#00150c'], ['SHIP IT.', '#000', '#6ff5c0'], ['LAUNCH.', '#fff', '#000'],
+        ['TRADE.', '#000', '#fff'], ['CURVE.', '#19d98f', '#00150c'], ['GRADUATE.', '#000', '#6ff5c0'], ['REPEAT.', '#fff', '#000'],
+      ];
+      const wbox = document.getElementById('s-words');
+      show('#s-words', B(9), B(17));
+      words.forEach(([txt, bg, fg], i) => {
+        const el = document.createElement('div');
+        el.className = 'full hide';
+        el.id = 'w' + i;
+        el.innerHTML = `<span class="word" style="color:${fg}">${txt}</span>`;
+        wbox.appendChild(el);
+        const t = B(9 + i);
+        tl.set('#w-bg', { backgroundColor: bg }, t);
+        show('#w' + i, t, B(10 + i));
+        const dir = i % 2 ? 1 : -1;
+        tl.fromTo('#w' + i + ' .word', { scale: 1.5, x: dir * 120, skewX: dir * -12 }, { scale: 1, x: 0, skewX: 0, duration: 0.16, ease: 'power4.out' }, t);
+        tl.to('#w' + i + ' .word', { scale: 1.08, duration: SPB - 0.16, ease: 'none' }, t + 0.16);
+        if (i % 2 === 1) shake(t, 12, 2);
+      });
+
+      /* ---------------- 3. breakdown: charge the curve ---------------- */
+      show('#s-break', B(17), DROP);
+      const kp = document.getElementById('k-pct');
+      const kfill = document.getElementById('k-fill');
+      const charge = { p: 0 };
+      tl.set(kfill, { scaleX: 0 }, 0);
+      tl.to(charge, { p: 0.99, duration: DROP - B(17) - 0.08, ease: 'power2.in', onUpdate: () => {
+        kfill.style.transform = `scaleX(${charge.p})`;
+        kp.textContent = String(Math.floor(charge.p * 100)).padStart(2, '0') + '%';
+      } }, B(17));
+      tl.fromTo('#k-box', { scale: 0.92 }, { scale: 1.12, duration: DROP - B(17), ease: 'power2.in' }, B(17));
+      // Jitter tightens into the drop.
+      for (let k = 0; k < 10; k++) {
+        const t = B(17) + 0.6 + k * 0.13;
+        if (t > DROP - 0.05) break;
+        tl.to('#k-box', { x: (k % 2 ? -1 : 1) * (3 + k * 2.2), duration: 0.05, ease: 'none' }, t);
+      }
+      tl.to('#k-box', { x: 0, duration: 0.03 }, DROP - 0.05);
+
+      /* ---------------- 4. DROP: launches fly at the camera ---------------- */
+      show('#s-tunnel', DROP, B(29));
+      flash(DROP, 1, 0.6);
+      shake(DROP, 40, 7);
+      const toks = [
+        ['Wild Berry', 'BERRY', ['#6ff5c0', '#0a7a4f'], 86], ['Greenleaf', 'LEAF', ['#1fe39a', '#04492d'], 100], ['Swirl', 'SWRL', ['#19d98f', '#06301f'], 64],
+        ['Pixel Oracle', 'PXL', ['#9ef7d2', '#1c5c44'], 58], ['Night Grove', 'GROVE', ['#2a8f6a', '#052117'], 71], ['Mint Agent', 'MINT', ['#b8ffe3', '#12714c'], 43],
+        ['Canopy', 'CNPY', ['#6ff5c0', '#073b27'], 92], ['Sprout', 'SPRT', ['#19d98f', '#0a7a4f'], 37],
+      ];
+      const cards = document.getElementById('t-cards');
+      const dirs = [[-1, -0.7], [1, -0.6], [-1, 0.7], [1, 0.8], [0, -1], [-1, 0.1], [1, 0.1], [0, 1]];
+      toks.forEach(([name, sym, [c1, c2], pct], i) => {
+        const el = document.createElement('div');
+        el.className = 'fly hide';
+        el.id = 'fly' + i;
+        el.innerHTML = `<div class="top"><div class="tl" style="background: radial-gradient(circle at 35% 30%, ${c1}, ${c2})">${sym.slice(0, 2)}</div>
+          <div><b>${name}</b><span class="label">$${sym}</span></div></div>
+          <span class="meter"><i style="transform: scaleX(${pct / 100})"></i></span>
+          <div class="row mono"><span>${(4.2 * pct / 100).toFixed(2)} ETH</span><span class="chip-up">${pct}%</span></div>`;
+        cards.appendChild(el);
+        const t = DROP + i * SPB;
+        const [dx, dy] = dirs[i];
+        tl.set(el, { opacity: 1 }, t);
+        tl.fromTo(el, { scale: 0.05, x: 0, y: 0, rotation: dx * -10, opacity: 0 },
+          { keyframes: [
+              { scale: 0.9, opacity: 1, x: dx * 260, y: dy * 150, rotation: 0, duration: 0.35, ease: 'power2.out' },
+              { scale: 3.4, x: dx * 1500, y: dy * 900, rotation: dx * 14, opacity: 0.9, duration: 0.75, ease: 'power3.in' },
+            ] }, t);
+        tl.set(el, { opacity: 0 }, t + 1.1);
+        flash(t, 0.18, 0.2, '#gflash');
+      });
+      tl.fromTo('#t-title', { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: 'power3.out' }, DROP + 0.2);
+      tl.fromTo('#t-title', { scale: 1 }, { scale: 1.08, duration: 3.3, ease: 'none' }, DROP + 0.5);
+
+      /* ---------------- 5. rocket to graduation ---------------- */
+      show('#s-rocket', B(29), B(37));
+      flash(B(29), 0.6, 0.3);
+      const W = 1600, H = 760;
+      const cy = (x) => H - 30 - 690 * Math.pow(x / W, 2.6);
+      let d = `M0 ${cy(0)}`;
+      for (let x = 10; x <= W; x += 10) d += ` L${x} ${cy(x).toFixed(1)}`;
+      document.getElementById('r-line').setAttribute('d', d);
+      document.getElementById('r-area').setAttribute('d', `${d} L${W} ${H} L0 ${H} Z`);
+      const rc = document.getElementById('r-clip-r'), rd = document.getElementById('r-dot'), rn = document.getElementById('r-num');
+      const rp = { p: 0 };
+      const rpaint = () => {
+        const x = rp.p * W;
+        rc.setAttribute('width', x.toFixed(1));
+        rd.setAttribute('cx', x.toFixed(1)); rd.setAttribute('cy', cy(x).toFixed(1));
+        rn.textContent = Math.round(rp.p * 100) + '%';
+      };
+      rpaint();
+      tl.to(rp, { p: 1, duration: B(32) - B(29), ease: 'power3.in', onUpdate: rpaint }, B(29));
+      tl.fromTo('#r-chart', { scale: 1 }, { scale: 1.06, duration: 3.6, ease: 'none', transformOrigin: '100% 0%' }, B(29));
+      [['#st1', 32], ['#st2', 34], ['#st3', 36]].forEach(([sel, b]) => {
+        show(sel, B(b));
+        tl.fromTo(sel + ' .stamp', { scale: 2.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.14, ease: 'power4.in' }, B(b));
+        flash(B(b) + 0.14, 0.55, 0.3, '#gflash');
+        shake(B(b) + 0.14, 30, 5);
+      });
+
+      /* ---------------- 6. ticker walls ---------------- */
+      show('#s-walls', B(37), B(45));
+      const rowsTxt = ['$BERRY  $LEAF  $SWRL  $PXL  $GROVE  $MINT  ', 'LAUNCH  TRADE  GRADUATE  LAUNCH  TRADE  ',
+        '$CNPY  $SPRT  $BERRY  $LEAF  $SWRL  $PXL  ', 'BERRYPAD  BERRYPAD  BERRYPAD  BERRYPAD  '];
+      const mw = document.getElementById('m-wrap');
+      rowsTxt.forEach((txt, i) => {
+        const el = document.createElement('div');
+        el.className = 'mrow ' + ['', 'o', 'g', 'o'][i];
+        el.id = 'mr' + i;
+        el.textContent = txt.repeat(3);
+        mw.appendChild(el);
+        const dir = i % 2 ? 1 : -1;
+        tl.fromTo(el, { x: dir > 0 ? -2600 : 0 }, { x: dir > 0 ? 0 : -2600, duration: B(45) - B(37), ease: 'none' }, B(37));
+      });
+      tl.fromTo('#s-walls', { rotation: -6 }, { rotation: -3, duration: B(45) - B(37), ease: 'none' }, B(37));
+      tl.set('#m-wrap', { scale: 1.05 }, 0);
+      for (let k = 0; k < 8; k++) {
+        const t = B(37 + k);
+        if (k % 2 === 1) { tl.set('#m-inv', { opacity: 1 }, t); tl.set('#m-inv', { opacity: 0 }, t + 0.12); }
+        tl.fromTo('#m-wrap', { scale: 1.12 }, { scale: 1.05, duration: 0.2, ease: 'power2.out' }, t);
+      }
+
+      /* ---------------- 7. strobe grid collapsing inward ---------------- */
+      show('#s-grid', B(45), FINAL);
+      const gl = ['LAUNCH', 'TRADE', 'CURVE', 'LIVE', '', 'EARN', 'SHIP', 'GRADUATE', 'REPEAT'];
+      const grid = document.getElementById('g-grid');
+      gl.forEach((txt, i) => {
+        const el = document.createElement('div');
+        el.className = 'gt';
+        el.id = 'g' + i;
+        el.innerHTML = i === 4 ? '<img src="assets/logo.svg" alt="" style="width:170px;height:170px" />' : txt;
+        grid.appendChild(el);
+        tl.fromTo(el, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.2, ease: 'back.out(2)' }, B(45) + (i % 3 + Math.floor(i / 3)) * 0.06);
+      });
+      // Strobe: light up tiles on the beat, in a chasing order.
+      const chase = [0, 2, 8, 6, 1, 5, 7, 3];
+      chase.forEach((gi, k) => {
+        const t = B(46) + k * SPB / 2;
+        if (t > FINAL - 0.5) return;
+        tl.fromTo('#g' + gi, { backgroundColor: '#19d98f', color: '#00150c' }, { backgroundColor: 'rgba(6,16,11,0.9)', color: '#effaf4', duration: 0.3, ease: 'power2.out' }, t);
+      });
+      tl.to('#g-grid', { scale: 3.2, duration: FINAL - (FINAL - 0.55), ease: 'power4.in', transformOrigin: '50% 50%' }, FINAL - 0.55);
+      tl.to('.gt:not(#g4)', { opacity: 0, duration: 0.3 }, FINAL - 0.4);
+
+      /* ---------------- 8. final logo slam ---------------- */
+      show('#s-end', FINAL);
+      flash(FINAL, 1, 0.7);
+      shake(FINAL, 44, 8);
+      tl.fromTo('#e-logo', { scale: 4, rotation: 30 }, { scale: 1, rotation: 0, duration: 0.2, ease: 'power4.out' }, FINAL);
+      tl.fromTo('#e-word', { scaleX: 1.8, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.3, ease: 'power4.out' }, FINAL + 0.15);
+      tl.fromTo('#e-row', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power3.out' }, FINAL + 0.35);
+      tl.fromTo('#e-col', { scale: 1 }, { scale: 1.05, duration: 1.2, ease: 'none' }, FINAL + 0.2);
+
+      window.__timelines['main'] = tl;
+    </script>
+  </body>
+</html>

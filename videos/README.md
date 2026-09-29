@@ -13,6 +13,11 @@ big hit lands on the film's key moment:
 | --- | --- | --- | --- |
 | `launch-it` | HeyGen `e5cb3a44…` "energetic premium tech launch" | 2.2s → 18.2s | 11.8s, the GRADUATED stamp |
 | `live-pad` | HeyGen `bc2db71a…` "dark futuristic cyber trailer" | 13.0s → 29.0s | 0.1s "Every launch." stab, silence under "Every fill.", 2.0s hit on "Live." |
+| `hype` | HeyGen `3b6f8a0d…` "hype cinematic drop" | 4.9s → 29.9s | drop at 10.12s, final hit (logo slam) at 23.6s |
+
+`hype` also has `beats/music.m4a.json` from `hyperframes beats` (128 BPM); the
+composition times every cut from that grid. Its web encode is 720p
+(`public/videos/hype.mp4`), with the 1080p file at `hype-1080.mp4`.
 
 On the site the films autoplay muted (browsers block autoplay with sound);
 each has a sound button.

@@ -4,23 +4,35 @@ import { useEffect, useRef, useState } from 'react'
 
 const VIDEOS = [
   {
+    src: '/videos/hype',
+    poster: '/videos/hype.jpg',
+    full: '/videos/hype-1080.mp4',
+    title: 'Berrypad — the hype reel',
+    body: '25 seconds, cut to the beat. Launch it, trade it, graduate it.',
+    wide: true,
+  },
+  {
     src: '/videos/launch-it',
     poster: '/videos/launch-it.jpg',
     title: 'Launch it',
     body: 'Name it, ticker it, one transaction. Then watch the curve fill and graduate.',
+    full: '/videos/launch-it.mp4',
+    wide: false,
   },
   {
     src: '/videos/live-pad',
     poster: '/videos/live-pad.jpg',
     title: 'The pad is live',
     body: 'Every launch racing to graduation, every fill as it lands, traders ranked live.',
+    full: '/videos/live-pad.mp4',
+    wide: false,
   },
 ] as const
 
 /**
  * Autoplaying, muted, looping launch films.
  *
- * The files are ~5 MB each, so nothing is fetched until a film is near the
+ * The files are 5–7 MB each, so nothing is fetched until a film is near the
  * viewport, and each one pauses when it scrolls away. H.264 plays in Chrome,
  * Safari and Edge; open-source Chromium and some Linux Firefox builds lack it,
  * so those get the VP9 WebM instead.
@@ -129,7 +141,7 @@ export function LaunchVideos() {
       <h2 className="text-center text-lg text-[var(--color-muted)]">See it in action</h2>
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
         {VIDEOS.map((v, i) => (
-          <figure key={v.src} className="card overflow-hidden">
+          <figure key={v.src} className={`card overflow-hidden ${v.wide ? 'lg:col-span-2' : ''}`}>
             <Film
               src={v.src}
               poster={v.poster}
@@ -143,7 +155,7 @@ export function LaunchVideos() {
                 <span className="mt-1 block text-sm text-[var(--color-muted)]">{v.body}</span>
               </span>
               <a
-                href={`${v.src}.mp4`}
+                href={v.full}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="pill shrink-0 px-3 py-1 text-xs"
