@@ -16,7 +16,7 @@ export const metadata = {
 }
 
 /** The project's X account, linked from the header and the footer. */
-const X_URL = 'https://x.com/wildberryagents'
+const X_URL = 'https://x.com/Berrypad3'
 
 function XIcon({ size = 15 }: { size?: number }) {
   return (
@@ -113,7 +113,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 hover:text-[var(--accent)]"
                   >
-                    <XIcon size={12} /> @wildberryagents
+                    <XIcon size={12} /> @Berrypad3
                   </a>
                   <p className="mt-3 text-[var(--color-muted)]">Built on public onchain data.</p>
                 </div>
