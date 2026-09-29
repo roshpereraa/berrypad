@@ -16,6 +16,7 @@ import { Ticker } from './Ticker'
 import { Identicon } from './Identicon'
 import { Logo } from './Logo'
 import { SwirlField } from './SwirlField'
+import { LaunchVideos } from './LaunchVideos'
 import { shortAddress } from '@/lib/display'
 import { readCache, writeCache } from '@/lib/cache'
 
@@ -396,6 +397,8 @@ export function LiveBoard() {
           </Panel>
         </div>
       </div>
+
+      <LaunchVideos />
 
       <HowItWorks />
     </>

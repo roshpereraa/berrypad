@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Berrypad — Launch it</title>
+    <link rel="stylesheet" href="assets/brand.css" />
+    <script src="assets/gsap.min.js"></script>
+    <script src="assets/swirl.js"></script>
+    <style>
+      .scene { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+
+      /* A — intro */
+      #a-logo { width: 260px; height: 260px; filter: drop-shadow(0 0 60px rgba(25,217,143,0.7)); }
+      #a-ring { position: absolute; width: 300px; height: 300px; border-radius: 50%; border: 3px solid var(--accent-hi); }
+      #a-word { position: absolute; top: 700px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px;
+        font-size: 96px; font-weight: 800; letter-spacing: 0.08em; }
+      #a-word span { display: inline-block; }
+      #a-word .pad { color: var(--accent); }
+
+      /* B — create */
+      #b-wrap { width: 1640px; display: flex; align-items: center; justify-content: space-between; }
+      #b-copy { width: 700px; }
+      #b-copy h2 { font-size: 132px; line-height: 0.98; font-weight: 700; letter-spacing: -0.03em; }
+      #b-copy h2 div { display: block; }
+      #b-copy p { margin-top: 36px; font-size: 32px; line-height: 1.4; color: rgba(239,250,244,0.72); width: 620px; }
+      #b-form { position: relative; width: 780px; padding: 56px; }
+      .field { margin-bottom: 30px; }
+      .field .label { display: block; margin-bottom: 12px; }
+      .input { height: 84px; border-radius: 18px; border: 1.5px solid var(--line); background: rgba(255,255,255,0.04);
+        display: flex; align-items: center; padding: 0 28px; font-size: 38px; font-weight: 600; }
+      .input.on { border-color: var(--accent); box-shadow: 0 0 0 5px rgba(25,217,143,0.16); }
+      .caret { display: inline-block; width: 3px; height: 44px; margin-left: 4px; background: var(--accent-hi); }
+      #b-row { display: flex; gap: 26px; align-items: flex-end; }
+      #b-row .field { flex: 1; }
+      #b-tile { width: 150px; height: 150px; margin-bottom: 30px; border-radius: 24px; border: 2px dashed rgba(255,255,255,0.18);
+        display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+      #b-tile-fill { position: absolute; inset: 0; background: radial-gradient(circle at 35% 30%, #1fe39a, #04492d);
+        display: flex; align-items: center; justify-content: center; }
+      #b-tile-fill img { width: 96px; height: 96px; }
+      #b-btn { height: 104px; font-size: 38px; margin-top: 12px; position: relative; overflow: hidden; }
+      #b-btn span { position: absolute; }
+      #b-cursor { position: absolute; left: 0; top: 0; width: 64px; height: 64px; }
+
+      /* C — curve */
+      #c-wrap { width: 1680px; }
+      #c-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; }
+      #c-head h2 { font-size: 92px; font-weight: 700; letter-spacing: -0.03em; }
+      #c-panel { display: grid; grid-template-columns: 1fr 440px; gap: 40px; padding: 48px; }
+      #c-token { display: flex; align-items: center; gap: 24px; margin-bottom: 26px; }
+      #c-token .t-logo { width: 88px; height: 88px; border-radius: 22px; background: radial-gradient(circle at 35% 30%, #1fe39a, #04492d);
+        display: flex; align-items: center; justify-content: center; }
+      #c-token .t-logo img { width: 58px; }
+      #c-token b { display: block; font-size: 44px; }
+      #c-stats { margin-left: auto; text-align: right; }
+      #c-raised { font-size: 64px; font-weight: 700; }
+      #c-pct { font-size: 30px; }
+      #c-chart { width: 100%; height: 400px; display: block; }
+      #c-meter { margin-top: 18px; }
+      #c-feed { display: flex; flex-direction: column; gap: 16px; }
+      .toast { height: 96px; border-radius: 20px; border: 1.5px solid var(--line); background: rgba(255,255,255,0.03);
+        display: flex; align-items: center; gap: 18px; padding: 0 22px; }
+      .toast .dot { width: 46px; height: 46px; border-radius: 12px; border: 2px solid var(--accent-lo); background: repeating-conic-gradient(#0a7a4f 0 25%, #03140c 0 50%) 0 0 / 14px 14px; }
+      .toast .who { display: flex; flex-direction: column; gap: 6px; font-size: 24px; font-weight: 600; white-space: nowrap; }
+      .toast .amt { margin-left: auto; font-size: 28px; }
+      .toast .tag { align-self: flex-start; font-size: 14px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 6px; }
+
+      /* D — graduate */
+      #d-stamp { font-size: 250px; font-weight: 800; letter-spacing: -0.02em; color: var(--accent);
+        text-shadow: 0 0 80px rgba(25,217,143,0.8); border: 12px solid var(--accent); border-radius: 36px; padding: 0 60px; }
+      #d-sub { position: absolute; top: 760px; left: 0; right: 0; display: flex; justify-content: center; align-items: center; gap: 28px;
+        font-size: 48px; font-weight: 600; }
+      #d-sub svg { width: 64px; height: 64px; }
+      #d-flash { position: absolute; inset: 0; background: var(--accent-hi); }
+
+      /* E — end */
+      #e-col { display: flex; flex-direction: column; align-items: center; }
+      #e-logo { width: 200px; height: 200px; filter: drop-shadow(0 0 50px rgba(25,217,143,0.6)); }
+      #e-line { margin-top: 40px; font-size: 128px; font-weight: 700; letter-spacing: -0.03em; }
+      #e-line span { display: inline-block; }
+      #e-cta { margin-top: 56px; display: flex; gap: 28px; align-items: center; }
+      #e-cta .btn { height: 96px; padding: 0 56px; font-size: 38px; }
+      #e-url { font-size: 44px; font-weight: 700; }
+      #e-x { margin-top: 26px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+      <div id="bg" class="clip" data-start="0" data-duration="16">
+        <canvas id="swirl"></canvas>
+        <div class="vignette"></div>
+      </div>
+
+      <section id="sa" class="clip" data-start="0" data-duration="2.8">
+        <div id="a-in" class="scene">
+          <div id="a-ring"></div>
+          <img id="a-logo" src="assets/logo.svg" alt="" />
+          <div id="a-word"><span>B</span><span>E</span><span>R</span><span>R</span><span>Y</span><span class="pad">P</span><span class="pad">A</span><span class="pad">D</span></div>
+        </div>
+      </section>
+
+      <section id="sb" class="clip" data-start="2.6" data-duration="4.1">
+        <div id="b-in" class="scene">
+          <div id="b-wrap">
+            <div id="b-copy">
+              <div class="label">01 · Create a coin</div>
+              <h2><div id="b-h1">Name it.</div><div id="b-h2" class="glow">Launch it.</div></h2>
+              <p id="b-p">One transaction deploys your coin through the launchpad factory. No presale. No allocation.</p>
+            </div>
+            <div id="b-form" class="panel">
+              <div id="b-row">
+                <div class="field">
+                  <span class="label">Name</span>
+                  <div id="b-name" class="input"><span id="b-name-t"></span><i id="b-caret1" class="caret"></i></div>
+                </div>
+                <div id="b-tile"><div id="b-tile-fill"><img src="assets/logo.svg" alt="" /></div></div>
+              </div>
+              <div class="field">
+                <span class="label">Ticker</span>
+                <div id="b-tick" class="input"><span id="b-tick-t" class="mono"></span><i id="b-caret2" class="caret"></i></div>
+              </div>
+              <div class="field">
+                <span class="label">Chain</span>
+                <div class="input" style="font-weight:500;color:var(--muted)">Robinhood Chain · paired with ETH</div>
+              </div>
+              <div id="b-btn" class="btn"><span id="b-btn-a">Launch coin</span><span id="b-btn-b">Live on chain ✓</span></div>
+              <svg id="b-cursor" viewBox="0 0 24 24"><path d="M4 2l16 9-7 1.6L9.6 20z" fill="#fff" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="sc" class="clip" data-start="6.5" data-duration="5">
+        <div id="c-in" class="scene">
+          <div id="c-wrap">
+            <div id="c-head">
+              <div>
+                <div class="label">02 · Trade the curve</div>
+                <h2>Everyone buys <span class="glow">the curve.</span></h2>
+              </div>
+            </div>
+            <div id="c-panel" class="panel">
+              <div>
+                <div id="c-token">
+                  <div class="t-logo"><img src="assets/logo.svg" alt="" /></div>
+                  <div><b>Wild Berry</b><span class="label">$BERRY</span></div>
+                  <div id="c-stats">
+                    <div id="c-raised" class="mono">0.00 ETH</div>
+                    <div id="c-pct" class="mono chip-up">0.0% to graduation</div>
+                  </div>
+                </div>
+                <svg id="c-chart" viewBox="0 0 1000 360" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="c-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#19d98f" stop-opacity="0.45" />
+                      <stop offset="1" stop-color="#19d98f" stop-opacity="0" />
+                    </linearGradient>
+                    <clipPath id="c-clip"><rect id="c-clip-r" x="0" y="0" width="0" height="360" /></clipPath>
+                  </defs>
+                  <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
+                    <line x1="0" y1="90" x2="1000" y2="90" /><line x1="0" y1="180" x2="1000" y2="180" /><line x1="0" y1="270" x2="1000" y2="270" />
+                  </g>
+                  <g clip-path="url(#c-clip)">
+                    <path id="c-area" fill="url(#c-grad)" />
+                    <path id="c-line" fill="none" stroke="#6ff5c0" stroke-width="5" stroke-linecap="round" />
+                  </g>
+                  <circle id="c-dot" r="12" fill="#6ff5c0" />
+                </svg>
+                <span id="c-meter" class="meter"><i id="c-meter-i"></i></span>
+              </div>
+              <div id="c-feed"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="sd" class="clip" data-start="11.3" data-duration="2.6">
+        <div id="d-in" class="scene">
+          <div id="d-stamp">GRADUATED</div>
+          <div id="d-sub">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6ff5c0" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <span>Uniswap V4 pool · liquidity <span class="glow">locked forever</span></span>
+          </div>
+          <div id="d-flash"></div>
+        </div>
+      </section>
+
+      <section id="se" class="clip" data-start="13.8" data-duration="2.2">
+        <div id="e-in" class="scene">
+          <div id="e-col">
+            <img id="e-logo" src="assets/logo.svg" alt="" />
+            <div id="e-line"><span id="e-w1">Launch it.</span> <span id="e-w2">Watch it <span class="glow">grow.</span></span></div>
+            <div id="e-cta">
+              <div class="btn">Create a coin</div>
+              <div id="e-url">berrypad.tech</div>
+            </div>
+            <div id="e-x" class="label">@Berrypad3 · Robinhood Chain</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const DUR = 16;
+      const tl = gsap.timeline({ paused: true });
+
+      /* ---------- background swirl, driven by timeline time ---------- */
+      const swirl = BerrySwirl.mount(document.getElementById('swirl'), { cell: 4, seed: 11, quietR: 0.85, quietX: 0.5 });
+      // Brightness over the film: dim under the form and curve, surge at graduation.
+      const gainKeys = [[0, 0.2], [1.2, 1.2], [2.6, 0.55], [6.5, 0.45], [11.2, 0.5], [11.5, 1.8], [13.6, 0.9], [16, 0.8]];
+      const quietKeys = [[0, 0.95], [2.6, 0.9], [6.5, 0.85], [11.3, 0.2], [13.8, 0.9], [16, 0.9]];
+      const lerpKeys = (keys, t) => {
+        for (let i = 1; i < keys.length; i++) {
+          if (t <= keys[i][0]) {
+            const [t0, v0] = keys[i - 1], [t1, v1] = keys[i];
+            return v0 + (v1 - v0) * ((t - t0) / (t1 - t0));
+          }
+        }
+        return keys[keys.length - 1][1];
+      };
+      const clock = { t: 0 };
+      tl.to(clock, {
+        t: DUR, duration: DUR, ease: 'none',
+        onUpdate: () => {
+          swirl.state.gain = lerpKeys(gainKeys, clock.t);
+          swirl.state.quiet = lerpKeys(quietKeys, clock.t);
+          swirl.draw(clock.t * 0.9);
+        },
+      }, 0);
+
+      /* ---------- A: logo sting ---------- */
+      tl.fromTo('#a-logo', { scale: 0.2, opacity: 0, rotation: -25 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.8, ease: 'back.out(1.8)' }, 0.15);
+      tl.fromTo('#a-ring', { scale: 0.6, opacity: 0.9 }, { scale: 3.2, opacity: 0, duration: 1.1, ease: 'power2.out' }, 0.55);
+      tl.fromTo('#a-word span', { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: 'power3.out' }, 0.8);
+      tl.to('#a-in', { scale: 5, opacity: 0, duration: 0.55, ease: 'power3.in' }, 2.25);
+
+      /* ---------- B: create a coin ---------- */
+      tl.fromTo('#b-in', { scale: 1.12, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: 'power3.out' }, 2.6);
+      tl.fromTo('#b-h1', { x: -60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 2.8);
+      tl.fromTo('#b-h2', { x: -60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 3.0);
+      tl.fromTo('#b-p', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 3.3);
+      tl.fromTo('#b-form', { x: 120, rotationY: -18, opacity: 0 }, { x: 0, rotationY: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }, 2.7);
+
+      const typeInto = (sel, text, at, dur) => {
+        const el = document.querySelector(sel);
+        const p = { n: 0 };
+        tl.to(p, { n: text.length, duration: dur, ease: 'none', onUpdate: () => { el.textContent = text.slice(0, Math.round(p.n)); } }, at);
+      };
+      tl.set('#b-name', { className: 'input on' }, 3.3);
+      typeInto('#b-name-t', 'Wild Berry', 3.35, 0.75);
+      tl.set('#b-name', { className: 'input' }, 4.15);
+      tl.set('#b-caret1', { opacity: 0 }, 4.15);
+      tl.set('#b-caret2', { opacity: 0 }, 0);
+      tl.set('#b-caret2', { opacity: 1 }, 4.15);
+      tl.set('#b-tick', { className: 'input on' }, 4.15);
+      typeInto('#b-tick-t', '$BERRY', 4.2, 0.45);
+      tl.set('#b-tick', { className: 'input' }, 4.75);
+      tl.set('#b-caret2', { opacity: 0 }, 4.75);
+      tl.fromTo('#b-tile-fill', { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.5, ease: 'back.out(2)' }, 4.7);
+
+      tl.fromTo('#b-cursor', { x: 700, y: 760, opacity: 0 }, { x: 700, y: 760, opacity: 1, duration: 0.2 }, 4.8);
+      tl.to('#b-cursor', { x: 380, y: 610, duration: 0.55, ease: 'power2.inOut' }, 5.0);
+      tl.to('#b-cursor', { scale: 0.8, duration: 0.08, yoyo: true, repeat: 1 }, 5.6);
+      tl.to('#b-btn', { scale: 0.95, duration: 0.08, yoyo: true, repeat: 1 }, 5.6);
+      tl.fromTo('#b-btn-a', { y: 0, opacity: 1 }, { y: -60, opacity: 0, duration: 0.3, ease: 'power2.in' }, 5.75);
+      tl.fromTo('#b-btn-b', { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'back.out(2)' }, 5.9);
+      tl.to('#b-in', { scale: 0.92, opacity: 0, duration: 0.4, ease: 'power2.in' }, 6.35);
+
+      /* ---------- C: the bonding curve ---------- */
+      const W = 1000, H = 360;
+      const curveY = (x) => H - 20 - 300 * Math.pow(x / W, 2.1);
+      let d = `M0 ${curveY(0)}`;
+      for (let x = 10; x <= W; x += 10) d += ` L${x} ${curveY(x).toFixed(1)}`;
+      document.getElementById('c-line').setAttribute('d', d);
+      document.getElementById('c-area').setAttribute('d', `${d} L${W} ${H} L0 ${H} Z`);
+
+      const buys = [
+        ['0x3a4f…91c2', '+0.42', 'buy'], ['0x7be0…0d4a', '+0.88', 'buy'], ['0x19c3…ae07', '−0.15', 'sell'],
+        ['0xd2f1…6b90', '+1.20', 'buy'], ['0x5e8a…c3f1', '+0.64', 'buy'],
+      ];
+      const feed = document.getElementById('c-feed');
+      buys.forEach(([who, amt, side], i) => {
+        const row = document.createElement('div');
+        row.className = 'toast';
+        row.id = 'c-t' + i;
+        row.innerHTML = `<span class="dot"></span><span class="who mono"><span>${who}</span><span class="tag mono ${side === 'buy' ? 'chip-up' : 'chip-down'}">${side === 'buy' ? 'BOUGHT' : 'SOLD'}</span></span><span class="amt mono ${side === 'buy' ? 'chip-up' : 'chip-down'}">${amt}</span>`;
+        feed.appendChild(row);
+        tl.fromTo(row, { x: 120, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: 'back.out(1.6)' }, 7.3 + i * 0.62);
+      });
+
+      tl.fromTo('#c-in', { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 6.5);
+      const raisedEl = document.getElementById('c-raised');
+      const pctEl = document.getElementById('c-pct');
+      const dot = document.getElementById('c-dot');
+      const clipR = document.getElementById('c-clip-r');
+      const meter = document.getElementById('c-meter-i');
+      const prog = { p: 0 };
+      const paint = () => {
+        const p = prog.p, x = p * W;
+        clipR.setAttribute('width', x.toFixed(1));
+        dot.setAttribute('cx', x.toFixed(1));
+        dot.setAttribute('cy', curveY(x).toFixed(1));
+        raisedEl.textContent = (4.2 * p).toFixed(2) + ' ETH';
+        pctEl.textContent = (100 * p).toFixed(1) + '% to graduation';
+        meter.style.transform = `scaleX(${p})`;
+      };
+      paint();
+      tl.to(prog, { p: 1, duration: 4.1, ease: 'power1.inOut', onUpdate: paint }, 6.9);
+      tl.to('#c-in', { scale: 1.06, duration: 4.5, ease: 'none' }, 6.6);
+      tl.to('#c-in', { opacity: 0, scale: 1.25, duration: 0.35, ease: 'power2.in' }, 11.1);
+
+      /* ---------- D: graduation ---------- */
+      tl.fromTo('#d-flash', { opacity: 0.85 }, { opacity: 0, duration: 0.6, ease: 'power2.out' }, 11.3);
+      tl.fromTo('#d-stamp', { scale: 2.6, opacity: 0, rotation: -8 }, { scale: 1, opacity: 1, rotation: -4, duration: 0.45, ease: 'power4.in' }, 11.35);
+      tl.to('#d-in', { x: 18, duration: 0.05, yoyo: true, repeat: 5, ease: 'none' }, 11.8);
+      tl.fromTo('#d-sub', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 12.1);
+      tl.to('#d-in', { opacity: 0, duration: 0.3 }, 13.6);
+
+      /* ---------- E: end card ---------- */
+      tl.fromTo('#e-logo', { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.8)' }, 13.85);
+      tl.fromTo('#e-w1', { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power3.out' }, 14.1);
+      tl.fromTo('#e-w2', { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power3.out' }, 14.3);
+      tl.fromTo('#e-cta', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power3.out' }, 14.6);
+      tl.fromTo('#e-x', { opacity: 0 }, { opacity: 1, duration: 0.4 }, 14.9);
+
+      window.__timelines['main'] = tl;
+    </script>
+  </body>
+</html>

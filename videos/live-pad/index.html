@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Berrypad — The pad is live</title>
+    <link rel="stylesheet" href="assets/brand.css" />
+    <script src="assets/gsap.min.js"></script>
+    <script src="assets/swirl.js"></script>
+    <style>
+      .scene { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+
+      /* A — kinetic words */
+      .word { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 230px; font-weight: 800; letter-spacing: -0.04em; }
+      #a-live { color: var(--accent); text-shadow: 0 0 90px rgba(25,217,143,0.8); }
+      #a-live i { display: inline-block; width: 44px; height: 44px; border-radius: 50%; background: var(--accent-hi);
+        margin-right: 40px; box-shadow: 0 0 40px var(--accent); }
+
+      /* B — the grid */
+      #b-stage { width: 1680px; perspective: 1800px; }
+      #b-plane { transform-origin: 50% 0%; }
+      #b-head { display: flex; align-items: center; gap: 24px; margin-bottom: 30px; }
+      #b-head h2 { font-size: 72px; font-weight: 700; letter-spacing: -0.02em; }
+      #b-tabs { margin-left: auto; display: flex; gap: 6px; padding: 7px; border-radius: 999px; border: 1.5px solid var(--line); }
+      #b-tabs span { padding: 10px 26px; border-radius: 999px; font-size: 24px; font-weight: 600; color: var(--muted); }
+      #b-tabs .on { background: rgba(25,217,143,0.22); color: #fff; }
+      #b-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+      .card { padding: 30px; border-radius: 26px; background: var(--panel); border: 1.5px solid var(--line); position: relative; }
+      .card .top { display: flex; align-items: center; gap: 20px; }
+      .tlogo { width: 82px; height: 82px; border-radius: 20px; display: flex; align-items: center; justify-content: center;
+        font-size: 28px; font-weight: 800; color: rgba(255,255,255,0.92); }
+      .card b { display: block; font-size: 34px; }
+      .card .row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 28px; }
+      .card .raised { font-size: 30px; }
+      .card .pct { font-size: 30px; color: var(--accent-hi); }
+      .card .meter { margin-top: 14px; }
+      .badge { position: absolute; top: 26px; right: 26px; font-family: 'JetBrains Mono', monospace; font-size: 17px; letter-spacing: 0.14em;
+        padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--accent); color: var(--accent); background: rgba(25,217,143,0.1); }
+
+      /* C — feed */
+      #c-wrap { width: 1680px; display: flex; align-items: center; justify-content: space-between; }
+      #c-copy { width: 760px; }
+      #c-copy h2 { font-size: 118px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+      #c-copy h2 div { display: block; }
+      #c-copy p { margin-top: 36px; font-size: 32px; line-height: 1.4; color: rgba(239,250,244,0.72); width: 640px; }
+      #c-panel { width: 780px; height: 820px; padding: 34px; overflow: hidden; position: relative; }
+      #c-panel .hd { display: flex; align-items: center; margin-bottom: 22px; }
+      #c-panel .hd b { font-size: 34px; }
+      #c-panel .hd .label { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+      .live-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-hi); box-shadow: 0 0 14px var(--accent); }
+      #c-viewport { position: relative; height: 680px; overflow: hidden; }
+      #c-list { position: absolute; left: 0; right: 0; top: 0; }
+      .fill { height: 104px; margin-bottom: 16px; border-radius: 20px; border: 1.5px solid var(--line); background: rgba(255,255,255,0.03);
+        display: flex; align-items: center; gap: 20px; padding: 0 24px; }
+      .fill .id { width: 56px; height: 56px; border-radius: 14px; }
+      .fill .who { display: flex; flex-direction: column; gap: 6px; }
+      .fill .who span:first-child { font-size: 26px; font-weight: 600; }
+      .fill .tok { font-size: 18px; color: var(--muted); letter-spacing: 0.1em; }
+      .fill .side { font-size: 16px; padding: 3px 9px; border: 1px solid var(--line); border-radius: 7px; margin-left: 10px; }
+      .fill .amt { margin-left: auto; font-size: 30px; }
+
+      /* D — leaderboard */
+      #d-wrap { width: 1300px; }
+      #d-wrap h2 { font-size: 96px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 30px; }
+      #d-board { position: relative; height: 560px; padding: 20px 34px; }
+      .rank { position: absolute; left: 34px; right: 34px; height: 96px; display: flex; align-items: center; gap: 24px;
+        border-radius: 20px; padding: 0 22px; }
+      .rank .n { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 600; background: rgba(255,255,255,0.06); color: var(--muted); }
+      .rank .id { width: 58px; height: 58px; border-radius: 14px; }
+      .rank .who2 { display: flex; flex-direction: column; gap: 4px; }
+      .rank .addr { font-size: 32px; font-weight: 600; }
+      .rank .sub { font-size: 18px; color: var(--muted); letter-spacing: 0.1em; }
+      .rank .vol { margin-left: auto; font-size: 36px; color: var(--accent-hi); }
+      #d-hl { position: absolute; left: 34px; right: 34px; height: 96px; border-radius: 20px;
+        background: rgba(25,217,143,0.12); border: 1.5px solid rgba(25,217,143,0.5); }
+
+      /* E — end */
+      #e-col { display: flex; flex-direction: column; align-items: center; text-align: center; }
+      #e-logo { width: 190px; height: 190px; filter: drop-shadow(0 0 50px rgba(25,217,143,0.6)); }
+      #e-word { margin-top: 34px; font-size: 64px; font-weight: 800; letter-spacing: 0.08em; }
+      #e-word .pad { color: var(--accent); }
+      #e-line { margin-top: 18px; font-size: 56px; font-weight: 500; color: rgba(239,250,244,0.85); }
+      #e-cta { margin-top: 54px; display: flex; gap: 24px; align-items: center; }
+      #e-cta .btn { height: 96px; padding: 0 56px; font-size: 36px; }
+      #e-cta .ghost { height: 96px; padding: 0 50px; border-radius: 999px; border: 2px solid var(--line); display: flex; align-items: center; font-size: 36px; font-weight: 600; }
+      #e-url { margin-top: 34px; font-size: 44px; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+      <div id="bg" class="clip" data-start="0" data-duration="16">
+        <canvas id="swirl"></canvas>
+        <div class="vignette"></div>
+      </div>
+
+      <section id="sa" class="clip" data-start="0" data-duration="2.9">
+        <div id="a-in" class="scene">
+          <div id="a-w1" class="word">Every launch.</div>
+          <div id="a-w2" class="word">Every fill.</div>
+          <div id="a-live" class="word"><i></i>Live.</div>
+        </div>
+      </section>
+
+      <section id="sb" class="clip" data-start="2.8" data-duration="4.9">
+        <div id="b-in" class="scene">
+          <div id="b-stage">
+            <div id="b-plane">
+              <div id="b-head">
+                <h2>Launches</h2>
+                <span class="label" style="display:flex;align-items:center;gap:10px"><i class="live-dot"></i>6 live curves</span>
+                <div id="b-tabs"><span class="on">Trending</span><span>Top raised</span><span>Newest</span></div>
+              </div>
+              <div id="b-grid"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="sc" class="clip" data-start="7.6" data-duration="4.2">
+        <div id="c-in" class="scene">
+          <div id="c-wrap">
+            <div id="c-copy">
+              <div class="label">Live feed</div>
+              <h2><div id="c-h1">Every buy.</div><div id="c-h2">Every sell.</div><div id="c-h3" class="glow">As it lands.</div></h2>
+              <p id="c-p">Read straight from Robinhood Chain in your browser. No backend, nothing to take on trust.</p>
+            </div>
+            <div id="c-panel" class="panel">
+              <div class="hd"><b>Live feed</b><span class="label"><i class="live-dot"></i>streaming</span></div>
+              <div id="c-viewport"><div id="c-list"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="sd" class="clip" data-start="11.7" data-duration="2.3">
+        <div id="d-in" class="scene">
+          <div id="d-wrap">
+            <h2>Top traders, <span class="glow">ranked live.</span></h2>
+            <div id="d-board" class="panel"><div id="d-hl"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="se" class="clip" data-start="13.9" data-duration="2.1">
+        <div id="e-in" class="scene">
+          <div id="e-col">
+            <img id="e-logo" src="assets/logo.svg" alt="" />
+            <div id="e-word">BERRY<span class="pad">PAD</span></div>
+            <div id="e-line">The launchpad for AI-agent tokens.</div>
+            <div id="e-cta"><div class="btn">Explore launches</div><div class="ghost">Create a coin</div></div>
+            <div id="e-url">berrypad.tech</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const DUR = 16;
+      const tl = gsap.timeline({ paused: true });
+
+      /* ---------- background ---------- */
+      const swirl = BerrySwirl.mount(document.getElementById('swirl'), { cell: 4, seed: 23, quietR: 0.6 });
+      const gainKeys = [[0, 1.3], [0.35, 1.9], [0.9, 1.0], [1.3, 1.6], [1.8, 1.0], [2.1, 2.1], [2.8, 0.6], [7.6, 0.45], [11.7, 0.5], [13.9, 0.9], [16, 0.9]];
+      const quietKeys = [[0, 0.7], [2.8, 0.95], [16, 0.9]];
+      const lerpKeys = (keys, t) => {
+        for (let i = 1; i < keys.length; i++) {
+          if (t <= keys[i][0]) { const [t0, v0] = keys[i - 1], [t1, v1] = keys[i]; return v0 + (v1 - v0) * ((t - t0) / (t1 - t0)); }
+        }
+        return keys[keys.length - 1][1];
+      };
+      const clock = { t: 0 };
+      tl.to(clock, { t: DUR, duration: DUR, ease: 'none', onUpdate: () => {
+        swirl.state.gain = lerpKeys(gainKeys, clock.t);
+        swirl.state.quiet = lerpKeys(quietKeys, clock.t);
+        swirl.draw(3 + clock.t * 1.1);
+      } }, 0);
+
+      /* ---------- A: kinetic words ---------- */
+      tl.fromTo('#a-w1', { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'power4.out' }, 0.1);
+      tl.to('#a-w1', { scale: 0.7, opacity: 0, duration: 0.25, ease: 'power2.in' }, 0.85);
+      tl.fromTo('#a-w2', { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'power4.out' }, 1.05);
+      tl.to('#a-w2', { scale: 0.7, opacity: 0, duration: 0.25, ease: 'power2.in' }, 1.75);
+      tl.fromTo('#a-live', { scale: 2.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'power4.out' }, 1.95);
+      tl.to('#a-in', { x: 14, duration: 0.04, yoyo: true, repeat: 5, ease: 'none' }, 2.3);
+      tl.to('#a-live', { scale: 6, opacity: 0, duration: 0.45, ease: 'power3.in' }, 2.5);
+
+      /* ---------- B: launches racing to graduation ---------- */
+      const tokens = [
+        ['Greenleaf', 'LEAF', 1.0, ['#1fe39a', '#04492d']],
+        ['Wild Berry', 'BERRY', 0.86, ['#6ff5c0', '#0a7a4f']],
+        ['Night Grove', 'GROVE', 0.71, ['#2a8f6a', '#052117']],
+        ['Pixel Oracle', 'PXL', 0.58, ['#9ef7d2', '#1c5c44']],
+        ['Swirl', 'SWRL', 0.44, ['#19d98f', '#06301f']],
+        ['Mint Agent', 'MINT', 0.29, ['#b8ffe3', '#12714c']],
+      ];
+      const grid = document.getElementById('b-grid');
+      tokens.forEach(([name, sym, target, [c1, c2]], i) => {
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.id = 'b-card' + i;
+        el.innerHTML = `
+          <div class="top">
+            <div class="tlogo" style="background: radial-gradient(circle at 35% 30%, ${c1}, ${c2})">${sym.slice(0, 2)}</div>
+            <div><b>${name}</b><span class="label">$${sym}</span></div>
+          </div>
+          <div class="row"><span class="raised mono" id="b-r${i}">0.000 ETH</span><span class="pct mono" id="b-p${i}">0.0%</span></div>
+          <span class="meter"><i id="b-m${i}"></i></span>
+          ${i === 0 ? '<span class="badge" id="b-badge">GRADUATED</span>' : ''}`;
+        grid.appendChild(el);
+        tl.fromTo(el, { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power3.out' }, 3.0 + i * 0.07);
+        const r = el.querySelector('#b-r' + i), p = el.querySelector('#b-p' + i), m = el.querySelector('#b-m' + i);
+        const s = { v: 0.04 };
+        const paint = () => {
+          r.textContent = (4.2 * s.v).toFixed(3) + ' ETH';
+          p.textContent = (100 * s.v).toFixed(1) + '%';
+          m.style.transform = `scaleX(${s.v})`;
+        };
+        paint();
+        tl.to(s, { v: target, duration: 3.1 - i * 0.12, ease: 'power2.inOut', onUpdate: paint }, 3.4);
+      });
+      tl.fromTo('#b-badge', { scale: 2.2, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(2.4)' }, 6.5);
+      tl.fromTo('#b-card0', { boxShadow: '0 0 0 0 rgba(25,217,143,0)' }, { boxShadow: '0 0 90px 6px rgba(25,217,143,0.55)', duration: 0.35, yoyo: true, repeat: 1 }, 6.5);
+      tl.fromTo('#b-plane', { rotationX: 26, y: 40, scale: 0.94 }, { rotationX: 0, y: 0, scale: 1, duration: 1.4, ease: 'power3.out' }, 2.8);
+      tl.fromTo('#b-in', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 2.8);
+      tl.to('#b-plane', { scale: 1.05, duration: 3.2, ease: 'none' }, 4.2);
+      tl.to('#b-in', { opacity: 0, y: -60, duration: 0.35, ease: 'power2.in' }, 7.35);
+
+      /* ---------- C: live feed ---------- */
+      const fills = [
+        ['0x3a4f…91c2', 'BERRY', 'buy', '0.4200'], ['0x7be0…0d4a', 'LEAF', 'buy', '1.1000'],
+        ['0x19c3…ae07', 'GROVE', 'sell', '0.1500'], ['0xd2f1…6b90', 'PXL', 'buy', '0.0800'],
+        ['0x5e8a…c3f1', 'SWRL', 'buy', '0.6400'], ['0x0c77…12ab', 'MINT', 'buy', '0.2500'],
+        ['0x8f02…e4d1', 'BERRY', 'sell', '0.3300'], ['0xa1b9…7c60', 'LEAF', 'buy', '2.0000'],
+        ['0x44de…9a0f', 'GROVE', 'buy', '0.5100'], ['0x9e13…b2c8', 'PXL', 'buy', '0.1900'],
+      ];
+      const list = document.getElementById('c-list');
+      const ROW = 120, SHOW = 5;
+      // Newest at the top: build in reverse so the list scrolls down as fills land.
+      [...fills].reverse().forEach(([who, sym, side, amt], i) => {
+        const up = side === 'buy';
+        const el = document.createElement('div');
+        el.className = 'fill';
+        el.innerHTML = `<span class="id" style="background: repeating-conic-gradient(${['#0a7a4f', '#19d98f', '#2a8f6a'][i % 3]} 0 25%, #03140c 0 50%) 0 0 / 19px 19px"></span>
+          <span class="who"><span class="mono">${who}<span class="side mono ${up ? 'chip-up' : 'chip-down'}">${up ? 'BOUGHT' : 'SOLD'}</span></span><span class="tok mono">$${sym}</span></span>
+          <span class="amt mono ${up ? 'chip-up' : 'chip-down'}">${up ? '+' : '−'}${amt}</span>`;
+        list.appendChild(el);
+      });
+      const extra = fills.length - SHOW;
+      tl.set('#c-list', { y: -extra * ROW }, 0);
+      for (let k = 0; k < extra; k++) {
+        tl.to('#c-list', { y: -(extra - k - 1) * ROW, duration: 0.32, ease: 'back.out(1.4)' }, 8.4 + k * 0.52);
+      }
+      tl.fromTo('#c-in', { x: 100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 7.6);
+      tl.fromTo('#c-h1', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out' }, 7.8);
+      tl.fromTo('#c-h2', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out' }, 8.1);
+      tl.fromTo('#c-h3', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out' }, 8.4);
+      tl.fromTo('#c-p', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 8.8);
+      tl.to('#c-in', { opacity: 0, scale: 0.94, duration: 0.3, ease: 'power2.in' }, 11.45);
+
+      /* ---------- D: leaderboard reshuffle ---------- */
+      const traders = [
+        ['0x7be0…0d4a', 22, 3.12], ['0x3a4f…91c2', 19, 2.84], ['0xd2f1…6b90', 17, 2.41],
+        ['0xa1b9…7c60', 15, 2.18], ['0x5e8a…c3f1', 12, 1.66],
+      ];
+      const board = document.getElementById('d-board');
+      const RH = 104, TOP = 20;
+      const order0 = [0, 1, 2, 3, 4];
+      const order1 = [3, 0, 1, 2, 4]; // 0xa1b9 climbs from #4 to #1
+      const rows = traders.map(([addr, n, v], i) => {
+        const el = document.createElement('div');
+        el.className = 'rank';
+        el.style.top = TOP + 'px';
+        el.innerHTML = `<span class="n">${i + 1}</span>
+          <span class="id" style="background: repeating-conic-gradient(${['#19d98f', '#0a7a4f', '#2a8f6a', '#6ff5c0', '#12714c'][i]} 0 25%, #03140c 0 50%) 0 0 / 20px 20px"></span>
+          <span class="who2"><span class="addr mono">${addr}</span><span class="sub mono">${n} FILLS</span></span>
+          <span class="vol mono">${v.toFixed(2)} ETH</span>`;
+        board.appendChild(el);
+        return el;
+      });
+      rows.forEach((el, i) => tl.set(el, { y: order0.indexOf(i) * RH }, 0));
+      tl.set('#d-hl', { top: TOP, y: 3 * RH }, 0);
+      tl.fromTo('#d-in', { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power3.out' }, 11.7);
+      rows.forEach((el, i) => tl.fromTo(el, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.35, ease: 'power3.out' }, 11.85 + i * 0.06));
+      tl.fromTo('#d-hl', { opacity: 0 }, { opacity: 1, duration: 0.25 }, 12.35);
+      rows.forEach((el, i) => tl.to(el, { y: order1.indexOf(i) * RH, duration: 0.6, ease: 'power3.inOut' }, 12.6));
+      tl.to('#d-hl', { y: 0, duration: 0.6, ease: 'power3.inOut' }, 12.6);
+      const vol3 = rows[3].querySelector('.vol'), n3 = rows[3].querySelector('.sub');
+      const bump = { v: 2.18, n: 15 };
+      tl.to(bump, { v: 3.47, n: 24, duration: 0.6, ease: 'power2.out', onUpdate: () => {
+        vol3.textContent = bump.v.toFixed(2) + ' ETH';
+        n3.textContent = Math.round(bump.n) + ' FILLS';
+      } }, 12.6);
+      // Rank numbers follow position.
+      rows.forEach((el, i) => {
+        const nEl = el.querySelector('.n');
+        tl.set(nEl, { textContent: String(order0.indexOf(i) + 1) }, 0);
+        tl.set(nEl, { textContent: String(order1.indexOf(i) + 1) }, 12.9);
+      });
+      tl.set(rows[3].querySelector('.n'), { backgroundColor: '#19d98f', color: '#00150c' }, 12.9);
+      tl.to('#d-in', { opacity: 0, duration: 0.3 }, 13.7);
+
+      /* ---------- E: end card ---------- */
+      tl.fromTo('#e-logo', { scale: 0.3, opacity: 0, rotation: 30 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.55, ease: 'back.out(1.8)' }, 13.95);
+      tl.fromTo('#e-word', { scaleX: 1.5, opacity: 0 }, { scaleX: 1, opacity: 1, duration: 0.6, ease: 'power3.out' }, 14.15);
+      tl.fromTo('#e-line', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power3.out' }, 14.4);
+      tl.fromTo('#e-cta', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power3.out' }, 14.65);
+      tl.fromTo('#e-url', { opacity: 0 }, { opacity: 1, duration: 0.4 }, 14.9);
+
+      window.__timelines['main'] = tl;
+    </script>
+  </body>
+</html>

@@ -8,3 +8,10 @@ node_modules/
 next-env.d.ts
 out/
 .vercel
+
+# HyperFrames working files
+videos/*/assets/
+videos/*/renders/
+videos/*/snapshots/
+videos/*/render.log
+.hyperframes/
