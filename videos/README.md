@@ -1,8 +1,21 @@
 # Berrypad launch films
 
 Two 16-second, 1920×1080, 30fps films made with [HyperFrames](https://github.com/heygen-com/hyperframes)
-(HTML compositions rendered frame-by-frame to MP4). Both are silent by design —
-they autoplay muted on the site.
+(HTML compositions rendered frame-by-frame to MP4), each with a music bed.
+
+## Music
+
+Both beds are from HeyGen's music catalog, cut to 16s, faded, and normalised
+to −16 LUFS (`music.m4a` in each project). The cuts are placed so the track's
+big hit lands on the film's key moment:
+
+| Film | Track | Cut from source | Hit lands on |
+| --- | --- | --- | --- |
+| `launch-it` | HeyGen `e5cb3a44…` "energetic premium tech launch" | 2.2s → 18.2s | 11.8s, the GRADUATED stamp |
+| `live-pad` | HeyGen `bc2db71a…` "dark futuristic cyber trailer" | 13.0s → 29.0s | 0.1s "Every launch." stab, silence under "Every fill.", 2.0s hit on "Live." |
+
+On the site the films autoplay muted (browsers block autoplay with sound);
+each has a sound button.
 
 | Film | Shows |
 | --- | --- |
@@ -27,6 +40,6 @@ npx hyperframes@0.8.91 render --fps 30 --quality high -o renders/launch-it.mp4
 Web encodes in `public/videos/`:
 
 ```bash
-ffmpeg -i renders/launch-it.mp4 -an -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart ../../public/videos/launch-it.mp4
-ffmpeg -i renders/launch-it.mp4 -an -c:v libvpx-vp9 -b:v 0 -crf 38 -row-mt 1 -pix_fmt yuv420p ../../public/videos/launch-it.webm
+ffmpeg -i renders/launch-it.mp4 -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart ../../public/videos/launch-it.mp4
+ffmpeg -i renders/launch-it.mp4 -c:v libvpx-vp9 -b:v 0 -crf 38 -row-mt 1 -pix_fmt yuv420p -c:a libopus -b:a 112k ../../public/videos/launch-it.webm
 ```
