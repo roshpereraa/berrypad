@@ -17,6 +17,7 @@ import { Identicon } from './Identicon'
 import { Logo } from './Logo'
 import { SwirlField } from './SwirlField'
 import { LaunchVideos } from './LaunchVideos'
+import { ContractAddressHero } from './ContractAddress'
 import { shortAddress } from '@/lib/display'
 import { readCache, writeCache } from '@/lib/cache'
 
@@ -149,6 +150,7 @@ export function LiveBoard() {
                 Explore launches
               </a>
             </div>
+            <ContractAddressHero />
           </div>
           <div className="hidden justify-self-center lg:block">
             <div className="drop-shadow-[0_0_40px_rgba(25,217,143,0.55)]">

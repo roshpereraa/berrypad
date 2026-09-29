@@ -1,40 +1,77 @@
 'use client'
 
 import { useState } from 'react'
+import { getAddress } from 'viem'
 import { explorerAddress } from '@/chain-adapter'
+import { BERRYPAD_CA } from '@/lib/token'
 
 /**
- * The project's own token.
+ * The Berrypad token address, validated and checksummed once at load.
  *
- * Deliberately empty until the address has been checked on chain: a contract
- * address is the one string on a site people copy and act on without reading.
- * Set NEXT_PUBLIC_BERRYPAD_CA on the deployment once it is verified; until
- * then the slot reads "not launched" rather than guessing.
+ * getAddress rejects a malformed or mis-checksummed address outright, so a
+ * typo can never render as something copyable.
  */
-export const CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_BERRYPAD_CA ?? '').trim()
-
-const VALID = /^0x[0-9a-fA-F]{40}$/
-
-export function ContractAddress({ compact = false }: { compact?: boolean }) {
-  const [copied, setCopied] = useState(false)
-  const address = CONTRACT_ADDRESS
-
-  if (!VALID.test(address)) {
-    return (
-      <span className={`label ${compact ? '' : 'block'}`} title="No token address is configured">
-        CA · not launched
-      </span>
-    )
+export const CONTRACT_ADDRESS: string | null = (() => {
+  const raw = BERRYPAD_CA.trim()
+  if (!raw) return null
+  try {
+    return getAddress(raw)
+  } catch {
+    console.error('BERRYPAD_CA is not a valid address:', raw)
+    return null
   }
+})()
 
+function useCopy(text: string) {
+  const [copied, setCopied] = useState(false)
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(address)
+      await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 1400)
     } catch {
       // Clipboard access can be refused; the address stays selectable either way.
     }
+  }
+  return { copied, copy }
+}
+
+/**
+ * The prominent version for the hero: the full address, a copy button and an
+ * explorer link. Renders nothing until the token is live.
+ */
+export function ContractAddressHero() {
+  const { copied, copy } = useCopy(CONTRACT_ADDRESS ?? '')
+  if (!CONTRACT_ADDRESS) return null
+  return (
+    <div className="mt-6 flex max-w-xl flex-wrap items-center gap-2 rounded-2xl border border-[var(--accent)]/40 bg-black/60 p-2 pl-4 backdrop-blur">
+      <span className="label !text-[var(--accent)]">CA</span>
+      <span className="num min-w-0 flex-1 text-[13px] [overflow-wrap:anywhere] select-all">{CONTRACT_ADDRESS}</span>
+      <button onClick={copy} className="btn-primary shrink-0 px-4 py-1.5 text-xs" aria-label="Copy contract address">
+        {copied ? 'Copied ✓' : 'Copy'}
+      </button>
+      <a
+        href={explorerAddress(CONTRACT_ADDRESS)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="pill shrink-0 px-3 py-1.5 text-xs"
+      >
+        Explorer ↗
+      </a>
+    </div>
+  )
+}
+
+export function ContractAddress({ compact = false }: { compact?: boolean }) {
+  const address = CONTRACT_ADDRESS
+  const { copied, copy } = useCopy(address ?? '')
+
+  if (!address) {
+    return (
+      <span className={`label ${compact ? '' : 'block'}`} title="The token is not live yet">
+        CA · coming soon
+      </span>
+    )
   }
 
   const short = `${address.slice(0, 6)}…${address.slice(-4)}`

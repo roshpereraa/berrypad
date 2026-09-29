@@ -6,7 +6,7 @@ import { NavPill } from '@/components/NavPill'
 import { NAV } from '@/lib/nav'
 import { Providers } from '@/components/Providers'
 import { SearchBox } from '@/components/SearchBox'
-import { ContractAddress } from '@/components/ContractAddress'
+import { CONTRACT_ADDRESS, ContractAddress } from '@/components/ContractAddress'
 import './globals.css'
 
 export const metadata = {
@@ -68,8 +68,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <ConnectWallet />
               </div>
             </div>
-            <div className="flex justify-center px-4 pb-2 md:hidden">
+            <div className="flex flex-col items-center gap-2 px-4 pb-2 md:hidden">
               <NavPill />
+              {CONTRACT_ADDRESS ? <ContractAddress compact /> : null}
             </div>
           </header>
 
