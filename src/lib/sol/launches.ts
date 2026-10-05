@@ -97,14 +97,26 @@ export function useBerrypadLaunches(limit = 24): {
   status: LaunchesStatus
   error: string | null
 } {
-  const cached = readCache<BerrypadLaunch[]>(CACHE_KEY)
-  const [launches, setLaunches] = useState<BerrypadLaunch[]>(cached?.data ?? [])
-  const [status, setStatus] = useState<LaunchesStatus>(cached ? 'ready' : 'loading')
+  /*
+   * The cache is read in the effect, never during render. Reading it during
+   * render makes the browser's first paint disagree with the server's HTML on
+   * any repeat visit - the server has no storage and renders skeletons, the
+   * browser has a cached list and renders rows - and React treats that
+   * mismatch as a failed hydration, which takes the whole page down rather
+   * than just this column.
+   */
+  const [launches, setLaunches] = useState<BerrypadLaunch[]>([])
+  const [status, setStatus] = useState<LaunchesStatus>('loading')
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // A cache written moments ago is good enough; skip the round trip.
-    if (cached && Date.now() - cached.at < FRESH_MS) return
+    const cached = readCache<BerrypadLaunch[]>(CACHE_KEY)
+    if (cached) {
+      setLaunches(cached.data)
+      setStatus('ready')
+      // A cache written moments ago is good enough; skip the round trip.
+      if (Date.now() - cached.at < FRESH_MS) return
+    }
     let live = true
     void (async () => {
       try {
@@ -129,9 +141,6 @@ export function useBerrypadLaunches(limit = 24): {
     return () => {
       live = false
     }
-    // cached is read once per mount on purpose: re-running on every change
-    // would refetch in a loop.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit])
 
   return { launches, status, error }
