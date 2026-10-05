@@ -200,6 +200,7 @@ export function TokenView() {
                 <CopyChip value={mintId} />
                 {meta?.twitter ? <Social href={meta.twitter} label="X" /> : null}
                 {meta?.telegram ? <Social href={meta.telegram} label="Telegram" /> : null}
+                {meta?.instagram ? <Social href={meta.instagram} label="Instagram" /> : null}
                 {meta?.website ? <Social href={meta.website} label="Website" /> : null}
                 <Social href={pumpFunCoin(mintId)} label="pump.fun" />
                 <Social href={explorerToken(mintId)} label="Solscan" />

@@ -20,6 +20,7 @@ export interface UriMetadata {
   twitter?: string
   telegram?: string
   website?: string
+  instagram?: string
 }
 
 const uriCache = new Map<string, Promise<UriMetadata | null>>()
@@ -55,6 +56,7 @@ export function fetchUriMetadata(uri: string): Promise<UriMetadata | null> {
             twitter: str(raw.twitter, 200),
             telegram: str(raw.telegram, 200),
             website: str(raw.website, 200),
+            instagram: str(raw.instagram, 200),
           }
         } catch {
           /* next gateway */

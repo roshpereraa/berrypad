@@ -40,6 +40,7 @@ export async function POST(request: Request): Promise<Response> {
   upstream.append('twitter', text(form, 'twitter', 200))
   upstream.append('telegram', text(form, 'telegram', 200))
   upstream.append('website', text(form, 'website', 200))
+  upstream.append('instagram', text(form, 'instagram', 200))
   upstream.append('showName', 'true')
 
   try {

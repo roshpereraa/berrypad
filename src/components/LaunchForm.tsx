@@ -77,6 +77,7 @@ export function LaunchForm() {
   const [twitter, setTwitter] = useState('')
   const [telegram, setTelegram] = useState('')
   const [website, setWebsite] = useState('')
+  const [instagram, setInstagram] = useState('')
   const [showSocials, setShowSocials] = useState(false)
   const [devBuy, setDevBuy] = useState('')
   const [advanced, setAdvanced] = useState(false)
@@ -286,6 +287,7 @@ export function LaunchForm() {
         form.append('twitter', twitter.trim())
         form.append('telegram', telegram.trim())
         form.append('website', website.trim())
+        form.append('instagram', instagram.trim())
         const res = await fetch('/api/ipfs', { method: 'POST', body: form })
         const body = (await res.json().catch(() => ({}))) as { metadataUri?: string; error?: string }
         if (!res.ok || !body.metadataUri) throw new Error(body.error ?? 'Could not store the metadata.')
@@ -536,9 +538,10 @@ export function LaunchForm() {
           {showSocials ? '− Hide socials' : '+ Add socials'} <span className="text-[var(--faint)]">(optional)</span>
         </button>
         {showSocials ? (
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <input className="field" value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="X / Twitter link" aria-label="X link" />
             <input className="field" value={telegram} onChange={(e) => setTelegram(e.target.value)} placeholder="Telegram link" aria-label="Telegram link" />
+            <input className="field" value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="Instagram link" aria-label="Instagram link" />
             <input className="field" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="Website" aria-label="Website" />
           </div>
         ) : null}
