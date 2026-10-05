@@ -8,4 +8,4 @@
  *
  * This is a Solana mint in base58, not an 0x address.
  */
-export const BERRYPAD_CA = 'FLKT45pKeRYoYHmWf7udsXF9Hc5Q1YtpuHN13wZ6gc8w'
+export const BERRYPAD_CA = ''
