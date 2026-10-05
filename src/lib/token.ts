@@ -7,4 +7,4 @@
  * contract address is the one string on a site people copy and act on
  * without reading.
  */
-export const BERRYPAD_CA = '0xee1d21337d6b230014e127f107106aff44ef495b'
+export const BERRYPAD_CA = ''
