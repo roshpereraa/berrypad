@@ -1,43 +1,22 @@
 'use client'
 
-import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useState, type ReactNode } from 'react'
-import { WagmiProvider } from 'wagmi'
-import { wagmiConfig } from '@/lib/wagmi'
-import '@rainbow-me/rainbowkit/styles.css'
+import { useMemo, type ReactNode } from 'react'
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
+import { RPC_URL, WS_URL } from '@/lib/sol/config'
+import '@solana/wallet-adapter-react-ui/styles.css'
 
+/**
+ * Wallets are discovered through the Wallet Standard, so Phantom, Solflare,
+ * Backpack and any other standard wallet appear without being bundled here.
+ */
 export function Providers({ children }: { children: ReactNode }) {
-  // One client per mount, so a fast refresh does not discard the cache.
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            // Chain reads go stale quickly; a launch can graduate in seconds.
-            staleTime: 5_000,
-            retry: 2,
-          },
-        },
-      }),
-  )
-
+  const config = useMemo(() => ({ commitment: 'confirmed' as const, wsEndpoint: WS_URL }), [])
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider
-          // The site is dark in every OS theme, so the wallet modal is too.
-          theme={darkTheme({
-            accentColor: '#19d98f',
-            accentColorForeground: '#00150c',
-            borderRadius: 'large',
-            overlayBlur: 'small',
-          })}
-          appInfo={{ appName: 'Berrypad' }}
-        >
-          {children}
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <ConnectionProvider endpoint={RPC_URL} config={config}>
+      <WalletProvider wallets={[]} autoConnect>
+        <WalletModalProvider>{children}</WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   )
 }

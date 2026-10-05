@@ -1,23 +1,26 @@
 'use client'
 
 import { useState } from 'react'
-import { getAddress } from 'viem'
-import { explorerAddress } from '@/chain-adapter'
+import { PublicKey } from '@solana/web3.js'
+import { explorerToken } from '@/lib/sol/config'
+import { isSolanaAddress } from '@/lib/sol/format'
 import { BERRYPAD_CA } from '@/lib/token'
 
 /**
- * The Berrypad token address, validated and checksummed once at load.
+ * The Berrypad token mint, validated once at load.
  *
- * getAddress rejects a malformed or mis-checksummed address outright, so a
- * typo can never render as something copyable.
+ * PublicKey rejects anything that is not a real base58 point, so a typo can
+ * never render as something copyable. The shape check runs first because
+ * PublicKey also accepts shorter strings that are not addresses.
  */
 export const CONTRACT_ADDRESS: string | null = (() => {
   const raw = BERRYPAD_CA.trim()
   if (!raw) return null
   try {
-    return getAddress(raw)
+    if (!isSolanaAddress(raw)) throw new Error('not a base58 address')
+    return new PublicKey(raw).toBase58()
   } catch {
-    console.error('BERRYPAD_CA is not a valid address:', raw)
+    console.error('BERRYPAD_CA is not a valid Solana mint:', raw)
     return null
   }
 })()
@@ -37,7 +40,7 @@ function useCopy(text: string) {
 }
 
 /**
- * The prominent version for the hero: the full address, a copy button and an
+ * The prominent version for the hero: the full mint, a copy button and an
  * explorer link. Renders nothing until the token is live.
  */
 export function ContractAddressHero() {
@@ -51,7 +54,7 @@ export function ContractAddressHero() {
         {copied ? 'Copied ✓' : 'Copy'}
       </button>
       <a
-        href={explorerAddress(CONTRACT_ADDRESS)}
+        href={explorerToken(CONTRACT_ADDRESS)}
         target="_blank"
         rel="noopener noreferrer"
         className="pill shrink-0 px-3 py-1.5 text-xs"
@@ -74,7 +77,7 @@ export function ContractAddress({ compact = false }: { compact?: boolean }) {
     )
   }
 
-  const short = `${address.slice(0, 6)}…${address.slice(-4)}`
+  const short = `${address.slice(0, 4)}…${address.slice(-4)}`
 
   return (
     <span className="inline-flex items-center gap-1.5">
@@ -88,7 +91,7 @@ export function ContractAddress({ compact = false }: { compact?: boolean }) {
       </button>
       {compact ? null : (
         <a
-          href={explorerAddress(address)}
+          href={explorerToken(address)}
           target="_blank"
           rel="noopener noreferrer"
           className="label hover:text-[var(--accent-hi)]"

@@ -31,6 +31,42 @@
   --glow: rgba(25, 217, 143, 0.5);
   --panel: rgba(6, 16, 11, 0.86);
   --hairline: rgba(255, 255, 255, 0.08);
+
+  /*
+   * Aliases for the shared component vocabulary.
+   *
+   * The Solana components are the same ones Agentmuse uses, and they name
+   * their colours in the shorter form (--text, --muted, --up). Pointing those
+   * names at the palette above is what makes them come out in Berrypad's
+   * black-and-emerald rather than carrying another site's colours over.
+   */
+  --bg: var(--color-paper);
+  --surface: var(--color-card);
+  /* A ladder above the card, for rows and wells that sit on top of one.
+     Berrypad's panels are near-black green, so each step lightens the
+     green rather than drifting towards grey. */
+  --surface-2: #0b1a12;
+  --surface-3: #112418;
+  --text: var(--color-ink);
+  --muted: var(--color-muted);
+  /* A third tier below --muted, for figures that must not compete. */
+  --faint: rgba(124, 148, 136, 0.62);
+  --line: var(--color-line);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --accent-soft: rgba(25, 217, 143, 0.14);
+  --up: var(--color-up);
+  --up-soft: rgba(127, 240, 196, 0.14);
+  --down: var(--color-down);
+  --down-soft: rgba(255, 107, 107, 0.14);
+  /* Attention without alarm: warnings and a leaderboard's top place. Amber
+     rather than emerald, so it never reads as the accent. */
+  --gold: #f0b429;
+  --radius: 16px;
+  --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Agentmuse loads Geist; Berrypad does not, so charts fall back to the
+     same mono stack every figure on the site already uses. */
+  --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 html {
@@ -370,4 +406,212 @@ main {
 @media (prefers-reduced-motion: reduce) {
   .tile { transition: none; }
   .tile:hover { transform: none; }
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Shared component vocabulary                                         */
+/* ------------------------------------------------------------------ */
+/*
+ * Classes the Solana components expect, carried over from the sibling
+ * codebase they are shared with. Every colour in here resolves through the
+ * aliases in :root, so these come out in Berrypad's black-and-emerald
+ * without a single hard-coded hex.
+ */
+
+.display {
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.gradient-text {
+  background: linear-gradient(100deg, #ffffff 10%, var(--accent-hi) 45%, #c4b5fd 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.inset {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.btn-down {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-weight: 650;
+  color: #04120c;
+  transition: filter 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-up { background: var(--up); }
+
+.btn-down { background: var(--down); color: #1a0508; }
+
+.btn-down:hover:not(:disabled) { filter: brightness(1.08); }
+
+.btn-down:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.tag-up {
+  color: var(--up);
+  background: var(--up-soft);
+  border-color: rgba(63, 224, 165, 0.25);
+}
+
+.tag-down {
+  color: var(--down);
+  background: var(--down-soft);
+  border-color: rgba(255, 95, 115, 0.25);
+}
+
+.tag-accent {
+  color: var(--accent-hi);
+  background: var(--accent-soft);
+  border-color: rgba(91, 140, 255, 0.3);
+}
+
+.tag-gold {
+  color: var(--gold);
+  background: rgba(255, 207, 92, 0.1);
+  border-color: rgba(255, 207, 92, 0.28);
+}
+
+.meter-thin { height: 4px; }
+
+.menu {
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.8);
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.65rem;
+  border-radius: 9px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.menu-item:hover { background: rgba(255, 255, 255, 0.06); }
+
+.field {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-size: 14px;
+}
+
+/* Toggle switch. */
+.switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--surface-3);
+  border: 1px solid var(--line-strong);
+  transition: background 0.18s ease;
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #cfd5e4;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.switch[aria-checked='true'] {
+  background: var(--accent);
+  border-color: transparent;
+}
+
+.switch[aria-checked='true']::after {
+  transform: translateX(18px);
+  background: #fff;
+}
+
+.switch:disabled { opacity: 0.45; cursor: not-allowed; }
+
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* A row that just arrived flashes once. */
+.flash-in {
+  animation: flash 1.2s ease-out;
+}
+
+@keyframes flash {
+  0% { background-color: rgba(91, 140, 255, 0.18); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-up {
+  0% { background-color: rgba(63, 224, 165, 0.16); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-down {
+  0% { background-color: rgba(255, 95, 115, 0.16); }
+  100% { background-color: transparent; }
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+}
+
+/* Wallet adapter modal, brought into the same palette. */
+.wallet-adapter-modal-wrapper {
+  background: var(--surface) !important;
+  border: 1px solid var(--line-strong);
+  border-radius: 20px !important;
+  font-family: var(--font-sans) !important;
+}
+
+.wallet-adapter-modal-title { font-family: var(--font-sans) !important; }
+
+.wallet-adapter-button {
+  font-family: var(--font-sans) !important;
+  border-radius: 12px !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  background: var(--surface-3) !important;
+}
+
+/**
+ * The squared-off sibling of .pill. Same surface and the same emerald hover,
+ * only with a 12px radius, for buttons that sit in a row of inputs rather
+ * than floating on their own.
+ */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid var(--hairline);
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--color-ink);
+  font-weight: 500;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+.btn-ghost:hover {
+  border-color: rgba(25, 217, 143, 0.45);
+  background: rgba(25, 217, 143, 0.1);
 }

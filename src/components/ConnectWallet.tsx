@@ -1,57 +1,89 @@
 'use client'
 
-import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { ROBINHOOD_CHAIN_ID } from '@/chain-adapter'
+import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import { explorerAccount } from '@/lib/sol/config'
+import { shortAddress } from '@/lib/sol/format'
 
-/**
- * Connect button with an explicit wrong-network state.
- *
- * Project rule 2: the app refuses to build or send a transaction anywhere but
- * Robinhood Chain. This is the visible half of that; the hooks enforce it again
- * before anything is signed.
- */
+/** Connect button, then an account menu once a wallet is connected. */
 export function ConnectWallet() {
-  return (
-    <ConnectButton.Custom>
-      {({ account, chain, openAccountModal, openChainModal, openConnectModal, mounted }) => {
-        const ready = mounted
-        const connected = ready && account && chain
+  const { publicKey, wallet, disconnect, connecting } = useWallet()
+  const { setVisible } = useWalletModal()
+  const [open, setOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const menu = useRef<HTMLDivElement>(null)
 
-        if (!ready) {
-          return <div className="shimmer h-8 w-28 rounded-full" />
-        }
-        if (!connected) {
-          return (
-            <button
-              onClick={openConnectModal}
-              type="button"
-              className="btn-primary px-4 py-1.5 text-sm"
-            >
-              Connect wallet
-            </button>
-          )
-        }
-        if (chain.unsupported || chain.id !== ROBINHOOD_CHAIN_ID) {
-          return (
-            <button
-              onClick={openChainModal}
-              type="button"
-              className="rounded-full border border-[var(--color-down)]/50 bg-[var(--color-down)]/15 px-4 py-1.5 text-sm font-medium text-[var(--color-down)] hover:bg-[var(--color-down)]/25"
-            >
-              Wrong network — switch
-            </button>
-          )
-        }
-        return (
+  useEffect(() => {
+    if (!open) return
+    const close = (e: MouseEvent) => {
+      if (!menu.current?.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [open])
+
+  if (!publicKey) {
+    return (
+      <button onClick={() => setVisible(true)} type="button" className="btn-primary h-9 whitespace-nowrap px-4 text-sm">
+        {connecting ? 'Connecting…' : (
+          <>
+            Connect<span className="hidden sm:inline">&nbsp;wallet</span>
+          </>
+        )}
+      </button>
+    )
+  }
+
+  const address = publicKey.toBase58()
+  return (
+    <div className="relative" ref={menu}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        type="button"
+        className="btn-ghost flex h-9 items-center gap-2 px-3 text-sm"
+        aria-expanded={open}
+      >
+        {wallet?.adapter.icon ? <img src={wallet.adapter.icon} alt="" className="h-4 w-4 rounded" /> : null}
+        <span className="num">{shortAddress(address)}</span>
+      </button>
+      {open ? (
+        <div className="menu absolute right-0 top-11 z-40 w-56 p-1.5">
           <button
-            onClick={openAccountModal}
-            type="button"
-            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:border-neutral-500 dark:border-neutral-700"
+            className="menu-item"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(address)
+                setCopied(true)
+                setTimeout(() => setCopied(false), 1200)
+              } catch {
+                /* still selectable below */
+              }
+            }}
           >
-            {account.displayName}
+            {copied ? 'Copied' : 'Copy address'}
           </button>
-        )
-      }}
-    </ConnectButton.Custom>
+          <a
+            className="menu-item"
+            href={explorerAccount(address)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+          >
+            View on Solscan ↗
+          </a>
+          <Link className="menu-item" href="/fees" onClick={() => setOpen(false)}>
+            Creator fees
+          </Link>
+          <button className="menu-item" onClick={() => { setOpen(false); setVisible(true) }}>
+            Change wallet
+          </button>
+          <button className="menu-item text-[var(--down)]" onClick={() => { setOpen(false); void disconnect() }}>
+            Disconnect
+          </button>
+        </div>
+      ) : null}
+    </div>
   )
 }

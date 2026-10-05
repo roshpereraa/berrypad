@@ -12,7 +12,7 @@ import './globals.css'
 export const metadata = {
   title: 'Berrypad — the launchpad for AI-agent tokens',
   description:
-    'Launch and trade AI-agent tokens on Robinhood Chain. Bonding curves that graduate into locked Uniswap pools, read live from the chain.',
+    'Launch and trade coins on Solana through pump.fun. Bonding curves that graduate onto PumpSwap, read live from the chain in your browser.',
 }
 
 /** The project's X account, linked from the header and the footer. */

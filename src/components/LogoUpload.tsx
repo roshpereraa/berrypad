@@ -1,96 +1,111 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { inspectLogo, uploadLogo } from '@/lib/storage'
+
+export const IMAGE_RULES = {
+  maxBytes: 5 * 1024 * 1024,
+  types: ['image/png', 'image/jpeg', 'image/webp', 'image/gif'],
+  minEdge: 200,
+}
+
+/** Reads the real dimensions rather than trusting the file name. */
+function inspect(file: File): Promise<{ ok: boolean; error?: string; warning?: string }> {
+  return new Promise((resolve) => {
+    if (!IMAGE_RULES.types.includes(file.type)) return resolve({ ok: false, error: 'Use a PNG, JPG, WEBP or GIF.' })
+    if (file.size > IMAGE_RULES.maxBytes) {
+      return resolve({ ok: false, error: `That file is ${(file.size / 1024 / 1024).toFixed(1)} MB. The limit is 5 MB.` })
+    }
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const { naturalWidth: w, naturalHeight: h } = img
+      if (Math.min(w, h) < IMAGE_RULES.minEdge) {
+        return resolve({ ok: false, error: `Image is ${w}×${h}. Use at least ${IMAGE_RULES.minEdge}×${IMAGE_RULES.minEdge}.` })
+      }
+      const ratio = w / h
+      resolve({ ok: true, warning: ratio < 0.95 || ratio > 1.05 ? 'pump.fun shows coins as squares, so this will be cropped.' : undefined })
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      resolve({ ok: false, error: 'That file could not be read as an image.' })
+    }
+    img.src = url
+  })
+}
 
 /**
- * Pick a file, see it, upload it, get back the URL that goes on chain.
- *
- * The URL is what the contract stores, so it is surfaced rather than hidden -
- * a creator can paste their own IPFS URI instead if they would rather not
- * depend on our hosting.
+ * Pick the coin image. It is held in the browser until launch, then pinned to
+ * IPFS through pump.fun with the rest of the metadata.
  */
-export function LogoUpload({
-  value,
-  onChange,
-}: {
-  value: string
-  onChange: (url: string) => void
-}) {
-  const fileRef = useRef<HTMLInputElement>(null)
-  const [busy, setBusy] = useState(false)
+export function LogoUpload({ file, onChange }: { file: File | null; onChange: (file: File | null) => void }) {
+  const input = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [warning, setWarning] = useState<string | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
+  const [dragging, setDragging] = useState(false)
 
-  const handle = async (file: File | undefined) => {
-    if (!file) return
+  const take = async (f: File | undefined) => {
+    if (!f) return
     setError(null)
     setWarning(null)
-    const check = await inspectLogo(file)
+    const check = await inspect(f)
     if (!check.ok) {
       setError(check.error ?? 'That image cannot be used.')
       return
     }
     setWarning(check.warning ?? null)
-    setPreview(URL.createObjectURL(file))
-    setBusy(true)
-    try {
-      onChange(await uploadLogo(file))
-    } catch (e) {
-      setError((e as Error).message)
-      setPreview(null)
-    } finally {
-      setBusy(false)
-    }
+    setPreview(URL.createObjectURL(f))
+    onChange(f)
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-start gap-3">
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-dashed border-white/20 bg-white/5 text-[10px] text-[var(--color-muted)] transition-colors hover:border-[var(--color-blue)]"
-        >
-          {preview || value ? (
-            <img src={preview ?? value} alt="" className="h-full w-full object-cover" />
+    <div>
+      <button
+        type="button"
+        onClick={() => input.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault()
+          setDragging(true)
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setDragging(false)
+          void take(e.dataTransfer.files[0])
+        }}
+        className={`group flex w-full items-center gap-4 rounded-2xl border border-dashed p-4 text-left transition-colors ${
+          dragging ? 'border-[var(--accent)] bg-[var(--accent-soft)]' : 'border-[var(--line-strong)] hover:border-[var(--accent)]'
+        }`}
+      >
+        <span className="relative grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-xl bg-[var(--surface-3)]">
+          {preview && file ? (
+            <img src={preview} alt="" className="h-full w-full object-cover" />
           ) : (
-            <span className="flex h-full items-center justify-center px-2 text-center">
-              Click to upload
-            </span>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="text-[var(--muted)]" aria-hidden>
+              <rect x="3" y="3" width="18" height="18" rx="4" />
+              <circle cx="9" cy="9" r="2" />
+              <path d="m21 15-5-5L5 21" />
+            </svg>
           )}
-          {busy ? (
-            <span className="absolute inset-0 flex items-center justify-center bg-black/70">
-              Uploading…
-            </span>
-          ) : null}
-        </button>
-
-        <div className="min-w-0 flex-1 space-y-1">
-          <p className="text-[11px] text-[var(--color-muted)]">
-            Square PNG, JPG, WEBP or GIF. At least 200×200, 512×512 recommended, under 5 MB.
-            Listings crop to a square tile.
-          </p>
-          <input
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="…or paste an image URL / ipfs:// URI"
-            className="w-full rounded-lg px-2 py-1 font-mono text-[11px]"
-          />
-        </div>
-      </div>
-
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-medium">{file ? file.name : 'Drop an image or click to choose'}</span>
+          <span className="mt-1 block text-xs leading-relaxed text-[var(--muted)]">
+            Square PNG, JPG, WEBP or GIF, at least 200×200, under 5 MB.
+          </span>
+          {file ? <span className="mt-2 inline-block text-xs text-[var(--accent-hi)]">Change image</span> : null}
+        </span>
+      </button>
       <input
-        ref={fileRef}
+        ref={input}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
+        accept={IMAGE_RULES.types.join(',')}
         className="hidden"
-        onChange={(e) => void handle(e.target.files?.[0])}
+        onChange={(e) => void take(e.target.files?.[0])}
       />
-
-      {error ? <p className="text-[11px] text-red-400">{error}</p> : null}
-      {warning ? <p className="text-[11px] text-amber-400">{warning}</p> : null}
+      {error ? <p className="mt-2 text-xs text-[#ffb3bd]">{error}</p> : null}
+      {warning && !error ? <p className="mt-2 text-xs text-[var(--gold)]">{warning}</p> : null}
     </div>
   )
 }
